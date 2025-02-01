@@ -9,15 +9,16 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export function LoginForm({
+export function SignupForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
+        <CardHeader className="space-y-6">
+          <CardTitle className="text-3xl text-center font-bold">🤑 stonks</CardTitle>
+          <CardTitle className="text-2xl text-center">Sign Up</CardTitle>
         </CardHeader>
         <CardContent>
           <form>
@@ -31,25 +32,29 @@ export function LoginForm({
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <Label htmlFor="username">Display Name</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Confirm Password</Label>
                 <Input id="password" type="password" required />
               </div>
               <Button type="submit" className="w-full">
-                Login
+                Sign Up
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
+              Already have an account?{" "}
               <a href="#" className="underline underline-offset-4">
-                Sign up
+                Login
               </a>
             </div>
           </form>
