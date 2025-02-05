@@ -1,16 +1,20 @@
-import express from 'express'
-import cors from 'cors'
-import dotenv from 'dotenv'
+import Fastify from 'fastify'
 import routes from './routes'
 
-dotenv.config()
-
 const PORT = process.env.PORT || 5000
-const app = express()
 
-app.use(express.json())
-app.use(cors())
+const fastify = Fastify({ logger: true })
 
-app.use('/api', routes)
+fastify.register(routes)
 
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
+const start = async () => {
+  try {
+    await fastify.listen({ port: Number(PORT), host: '0.0.0.0' })
+    console.log(`Fastify server running on http://localhost:${PORT}`)
+  } catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
+}
+
+start()
