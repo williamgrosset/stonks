@@ -1,14 +1,18 @@
 import Fastify from 'fastify'
-import routes from './routes'
+import stockTransactionRoutes from './routes/transactions/stocks'
+import walletTransactionRoutes from './routes/transactions/wallets'
+
+const PORT = process.env.PORT || 3000
 
 const fastify = Fastify({ logger: true })
 
-fastify.register(routes)
+fastify.register(stockTransactionRoutes)
+fastify.register(walletTransactionRoutes)
 
 const start = async () => {
   try {
-    await fastify.listen({ port: 3000 })
-    console.log('Fastify server running on http://localhost:3000')
+    await fastify.listen({ port: Number(PORT), host: '0.0.0.0' })
+    console.log(`Fastify server running on http://localhost:${PORT}`)
   } catch (err) {
     fastify.log.error(err)
     process.exit(1)

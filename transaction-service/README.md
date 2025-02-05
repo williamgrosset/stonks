@@ -1,8 +1,7 @@
-# user-service
+# transaction-service
 
 ## Development
 
-```
-pnpm i
-pnpm dev
+```bash
+docker-compose up
 ```
