@@ -22,5 +22,6 @@ EXPOSE 3000
 # Generate Prisma client
 RUN pnpm prisma generate
 
-# Run database migrations before starting the server
-CMD ["sh", "-c", "pnpm prisma migrate deploy && pnpm dev"]
+# Force schema sync before starting the server
+# NOTE: Do NOT do this in production
+CMD ["sh", "-c", "pnpm prisma db push && pnpm dev"]
