@@ -12,9 +12,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  app:
-    build: .
-    container_name: fastify_app
+  transaction-service:
+    build: ./transaction-service
+    container_name: transaction_service
     depends_on:
       - db
     ports:
@@ -22,7 +22,17 @@ services:
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
     volumes:
-      - .:/app
+      - ./transaction-service:/app
+
+  user-service:
+    build: ./user-service
+    container_name: user_service
+    depends_on:
+      - transaction-service
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./user-service:/app
 
 volumes:
   postgres_data:

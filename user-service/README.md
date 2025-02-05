@@ -2,7 +2,6 @@
 
 ## Development
 
-```
-pnpm i
-pnpm dev
+```bash
+docker-compose up --build user-service
 ```

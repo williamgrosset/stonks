@@ -1,2 +1,9 @@
 # stonks
-a highly scalable &amp; performant day trading system
+
+a highly scalable & performant day trading system
+
+## Development
+
+```bash
+docker-compose up
+```
