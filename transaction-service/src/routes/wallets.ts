@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import prisma from '../../../prisma'
+import prisma from '../prisma'
 
 const WALLET_TRANSACTIONS_PATH = '/transactions/wallets'
 
