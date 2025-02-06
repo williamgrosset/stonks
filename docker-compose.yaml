@@ -12,27 +12,40 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  transaction-service:
-    build: ./transaction-service
-    container_name: transaction_service
+  shared-prisma:
+    build:
+      context: .
+      dockerfile: ./shared/prisma/Dockerfile
     depends_on:
       - db
+    restart: on-failure
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: ./transaction-service/Dockerfile
+    container_name: transaction_service
+    depends_on:
+      - shared-prisma
     ports:
       - '3000:3000'
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
-    volumes:
-      - ./transaction-service:/app
 
   user-service:
-    build: ./user-service
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
     container_name: user_service
     depends_on:
+      - shared-prisma
       - transaction-service
     ports:
       - '3001:3001'
-    volumes:
-      - ./user-service:/app
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
 
 volumes:
   postgres_data:

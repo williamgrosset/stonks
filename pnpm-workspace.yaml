@@ -1,0 +1,5 @@
+packages:
+  - 'user-service'
+  - 'transaction-service'
+  - 'shared/prisma'
+

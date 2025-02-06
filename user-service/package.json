@@ -9,6 +9,7 @@
   "dependencies": {
     "@fastify/autoload": "^6.1.0",
     "@fastify/cors": "^10.0.2",
+    "@shared/prisma": "workspace:^",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "fastify": "^5.2.1",

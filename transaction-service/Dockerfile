@@ -1,27 +1,24 @@
-# Use Node.js base image
-FROM node:18
+FROM node:18-alpine
 
-# Install pnpm globally
-RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
-
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
+# Install pnpm globally
+RUN npm install -g pnpm
 
-# Install dependencies using pnpm
+# Copy the monorepo configuration files
+COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
+
+# Copy the shared prisma package and transaction-service into the image
+COPY shared/prisma/ ./shared/prisma/
+COPY transaction-service/ ./transaction-service/
+
+# Install all dependencies for the workspace
 RUN pnpm install --frozen-lockfile
 
-# Copy the rest of the project
-COPY . .
+# Generate Prisma client
+RUN pnpm --filter @shared/prisma run generate
 
-# Expose Fastify's default port
 EXPOSE 3000
 
-# Generate Prisma client
-RUN pnpm prisma generate
-
-# Force schema sync before starting the server
-# NOTE: Do NOT do this in production
-CMD ["sh", "-c", "pnpm prisma db push && pnpm dev"]
+# Run the Fastify server
+CMD ["sh", "-c", "pnpm --filter transaction-service run dev"]

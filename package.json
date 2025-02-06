@@ -1,0 +1,8 @@
+{
+  "name": "stonks",
+  "workspaces": [
+    "user-service",
+    "transaction-service",
+    "prisma"
+  ]
+}

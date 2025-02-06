@@ -10,12 +10,11 @@
   "dependencies": {
     "@fastify/autoload": "^6.1.0",
     "@fastify/cors": "^10.0.2",
-    "@prisma/client": "^6.3.1",
+    "@shared/prisma": "workspace:^",
     "fastify": "^5.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.13.1",
-    "prisma": "^6.3.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.7.3"
   },
