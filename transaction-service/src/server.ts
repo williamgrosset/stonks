@@ -2,7 +2,7 @@ import Fastify from 'fastify'
 import stockTransactionRoutes from './routes/stocks'
 import walletTransactionRoutes from './routes/wallets'
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 
 const fastify = Fastify({ logger: true })
 

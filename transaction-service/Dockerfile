@@ -18,7 +18,7 @@ RUN pnpm install --frozen-lockfile
 # Generate Prisma client
 RUN pnpm --filter @shared/prisma run generate
 
-EXPOSE 3000
+EXPOSE 3001
 
 # Run the Fastify server
 CMD ["sh", "-c", "pnpm --filter transaction-service run dev"]

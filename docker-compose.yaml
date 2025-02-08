@@ -22,18 +22,6 @@ services:
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
 
-  transaction-service:
-    build:
-      context: .
-      dockerfile: ./transaction-service/Dockerfile
-    container_name: transaction_service
-    depends_on:
-      - shared-prisma
-    ports:
-      - '3000:3000'
-    environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
-
   user-service:
     build:
       context: .
@@ -41,7 +29,18 @@ services:
     container_name: user_service
     depends_on:
       - shared-prisma
-      - transaction-service
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+
+  transaction-service:
+    build:
+      context: .
+      dockerfile: ./transaction-service/Dockerfile
+    container_name: transaction_service
+    depends_on:
+      - shared-prisma
     ports:
       - '3001:3001'
     environment:

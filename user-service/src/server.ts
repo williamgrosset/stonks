@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
 import routes from './routes'
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 
 const fastify = Fastify({ logger: true })
 
