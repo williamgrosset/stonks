@@ -1,5 +1,6 @@
 packages:
   - 'user-service'
   - 'transaction-service'
-  - 'shared/prisma'
+  - 'order-service'
 
+  - 'shared/prisma'
