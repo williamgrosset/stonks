@@ -3,6 +3,8 @@
   "workspaces": [
     "user-service",
     "transaction-service",
+    "order-service",
+    "matching-engine-service",
     "prisma"
   ]
 }
