@@ -12,4 +12,7 @@ docker-compose up
 
 ### Update schema & clients
 
-TODO
+```bash
+cd shared/prisma
+pnpm generate
+```
