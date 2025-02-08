@@ -2,5 +2,6 @@ packages:
   - 'user-service'
   - 'transaction-service'
   - 'order-service'
+  - 'matching-engine-service'
 
   - 'shared/prisma'
