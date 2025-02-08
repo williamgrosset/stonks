@@ -10,7 +10,7 @@ a highly scalable & performant day trading system
 docker-compose up
 ```
 
-### Update schema & clients
+### Update Prisma client
 
 ```bash
 cd shared/prisma

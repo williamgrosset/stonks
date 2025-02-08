@@ -8,7 +8,7 @@ datasource db {
 }
 
 model users {
-  user_id        Int     @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   user_name      String  @unique @db.VarChar(255)
   password       String
   display_name   String? @db.VarChar(255)
@@ -21,27 +21,27 @@ model users {
 }
 
 model stocks {
-  stock_id   Int    @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   user_id    Int
   stock_name String @unique @db.VarChar(255)
 
-  user               users                @relation(fields: [user_id], references: [user_id])
+  user               users                @relation(fields: [user_id], references: [id])
   shares             shares[]
   stock_transactions stock_transactions[]
 }
 
 model shares {
-  share_id Int @id @default(autoincrement())
+  id       Int @id @default(autoincrement())
   stock_id Int
   user_id  Int
   quantity Int @default(0)
 
-  stock stocks @relation(fields: [stock_id], references: [stock_id])
-  user  users  @relation(fields: [user_id], references: [user_id])
+  stock stocks @relation(fields: [stock_id], references: [id])
+  user  users  @relation(fields: [user_id], references: [id])
 }
 
 model stock_transactions {
-  transaction_id              Int      @id @default(autoincrement())
+  id                          Int      @id @default(autoincrement())
   parent_stock_transaction_id Int?
   wallet_transaction_id       Int?     @unique
   stock_id                    Int
@@ -52,20 +52,20 @@ model stock_transactions {
   price                       Decimal  @db.Decimal(12, 2)
   time_stamp                  DateTime @default(now()) @db.Timestamptz
 
-  stock              stocks               @relation(fields: [stock_id], references: [stock_id])
-  user               users                @relation(fields: [user_id], references: [user_id])
-  parent_transaction stock_transactions?  @relation("StockTransactionParent", fields: [parent_stock_transaction_id], references: [transaction_id])
+  stock              stocks               @relation(fields: [stock_id], references: [id])
+  user               users                @relation(fields: [user_id], references: [id])
+  parent_transaction stock_transactions?  @relation("StockTransactionParent", fields: [parent_stock_transaction_id], references: [id])
   child_transactions stock_transactions[] @relation("StockTransactionParent")
-  wallet_transaction wallet_transactions? @relation(fields: [wallet_transaction_id], references: [transaction_id])
+  wallet_transaction wallet_transactions? @relation(fields: [wallet_transaction_id], references: [id])
 }
 
 model wallet_transactions {
-  transaction_id Int      @id @default(autoincrement())
-  user_id        Int
-  is_debit       Boolean
-  amount         Decimal  @db.Decimal(12, 2)
-  time_stamp     DateTime @default(now()) @db.Timestamptz
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  is_debit   Boolean
+  amount     Decimal  @db.Decimal(12, 2)
+  time_stamp DateTime @default(now()) @db.Timestamptz
 
   stock_transaction stock_transactions?
-  user              users               @relation(fields: [user_id], references: [user_id])
+  user              users               @relation(fields: [user_id], references: [id])
 }
