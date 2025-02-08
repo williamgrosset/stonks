@@ -46,5 +46,28 @@ services:
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
 
+  order-service:
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    container_name: order_service
+    depends_on:
+      - shared-prisma
+    ports:
+      - '3002:3002'
+    environment:
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+
+  matching-engine-service:
+    build:
+      context: .
+      dockerfile: ./matching-engine-service/Dockerfile
+    container_name: matching_engine_service
+    depends_on:
+      - order-service
+      - transaction-service
+    ports:
+      - '3003:3003'
+
 volumes:
   postgres_data:
