@@ -53,6 +53,7 @@ services:
     container_name: order_service
     depends_on:
       - shared-prisma
+      - matching-engine-service
     ports:
       - '3002:3002'
     environment:
@@ -64,7 +65,6 @@ services:
       dockerfile: ./matching-engine-service/Dockerfile
     container_name: matching_engine_service
     depends_on:
-      - order-service
       - transaction-service
     ports:
       - '3003:3003'
