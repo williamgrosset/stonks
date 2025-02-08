@@ -1,10 +1,9 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import prisma from './prisma'
 
 const SECRET_KEY = process.env.JWT_SECRET || 'supersecret'
-
-const users: { id: number; username: string; password: string }[] = []
 
 async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: { username: string; password: string } }>(
@@ -18,9 +17,19 @@ async function authRoutes(fastify: FastifyInstance) {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
-        users.push({ id: users.length + 1, username, password: hashedPassword })
 
-        return reply.status(201).send({ message: 'User registered' })
+        const user = await prisma.users.create({
+          data: {
+            user_name: username,
+            password: hashedPassword
+          },
+          select: {
+            id: true,
+            user_name: true
+          }
+        })
+
+        return reply.status(201).send({ user })
       } catch (error) {
         return reply.status(500).send({ message: 'Internal server error' })
       }
@@ -32,13 +41,18 @@ async function authRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       try {
         const { username, password } = request.body
-        const user = users.find(u => u.username === username)
+
+        const user = await prisma.users.findUnique({
+          where: {
+            user_name: username
+          }
+        })
 
         if (!user || !(await bcrypt.compare(password, user.password))) {
           return reply.status(401).send({ message: 'Invalid credentials' })
         }
 
-        const token = jwt.sign({ id: user.id, username: user.username }, SECRET_KEY, {
+        const token = jwt.sign({ id: user.id, username: user.user_name }, SECRET_KEY, {
           expiresIn: '1h'
         })
 
