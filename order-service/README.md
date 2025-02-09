@@ -3,6 +3,5 @@
 ## Development
 
 ```bash
-docker-compose up --build order-service
+docker compose up --build order-service
 ```
-

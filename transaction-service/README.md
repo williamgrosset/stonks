@@ -3,5 +3,5 @@
 ## Development
 
 ```bash
-docker-compose up --build transaction-service
+docker compose up --build transaction-service
 ```

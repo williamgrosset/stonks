@@ -3,5 +3,5 @@
 ## Development
 
 ```bash
-docker-compose up --build matching-engine-service
+docker compose up --build matching-engine-service
 ```

@@ -3,5 +3,5 @@
 ## Development
 
 ```bash
-docker-compose up --build user-service
+docker compose up --build user-service
 ```

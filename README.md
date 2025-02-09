@@ -7,7 +7,7 @@ a highly scalable & performant day trading system
 ### Run services
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ### Update Prisma client
