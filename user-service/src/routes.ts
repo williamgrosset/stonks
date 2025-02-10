@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import prisma from './prisma'
 
-const SECRET_KEY = process.env.JWT_SECRET || 'supersecret'
+const SECRET_KEY = 'supersecret'
 
 async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: { username: string; password: string } }>(
@@ -52,8 +52,8 @@ async function authRoutes(fastify: FastifyInstance) {
           return reply.status(401).send({ message: 'Invalid credentials' })
         }
 
-        const token = jwt.sign({ id: user.id, username: user.user_name }, SECRET_KEY, {
-          expiresIn: '1h'
+        const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
+          expiresIn: '1d'
         })
 
         return reply.send({ token })
