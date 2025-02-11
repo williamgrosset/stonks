@@ -11,14 +11,14 @@ RUN npm install -g pnpm
 COPY pnpm-workspace.yaml ./
 COPY package.json pnpm-lock.yaml* ./
 
-# Copy the shared prisma package into the image
-COPY shared/prisma ./shared/prisma
+# Copy the prisma package into the image
+COPY prisma ./prisma
 
 # Install all dependencies for the workspace
 RUN pnpm install --frozen-lockfile
 
 # Generate client
-RUN pnpm --filter @shared/prisma run generate
+RUN pnpm --filter prisma run generate
 
 # The DATABASE_URL is not available at build time, so we run db push at runtime
-CMD ["sh", "-c", "pnpm --filter @shared/prisma run push"]
+CMD ["sh", "-c", "pnpm --filter prisma run push"]

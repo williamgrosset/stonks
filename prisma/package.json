@@ -1,5 +1,5 @@
 {
-  "name": "@shared/prisma",
+  "name": "prisma",
   "main": "dist/client.js",
   "scripts": {
     "generate": "prisma generate",

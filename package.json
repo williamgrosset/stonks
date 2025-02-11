@@ -1,10 +1,10 @@
 {
   "name": "stonks",
   "workspaces": [
+    "prisma",
     "user-service",
     "transaction-service",
     "order-service",
-    "matching-engine-service",
-    "prisma"
+    "matching-engine-service"
   ]
 }

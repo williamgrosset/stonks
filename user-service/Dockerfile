@@ -8,15 +8,15 @@ RUN npm install -g pnpm
 # Copy the monorepo configuration files
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 
-# Copy the shared prisma package and user-service into the image
-COPY shared/prisma/ ./shared/prisma/
+# Copy the prisma package and user-service into the image
+COPY prisma/ ./prisma/
 COPY user-service/ ./user-service/
 
 # Install all dependencies for the workspace
 RUN pnpm install --frozen-lockfile
 
 # Generate Prisma client
-RUN pnpm --filter @shared/prisma run generate
+RUN pnpm --filter prisma run generate
 
 EXPOSE 3000
 

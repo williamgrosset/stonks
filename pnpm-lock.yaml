@@ -41,12 +41,12 @@ importers:
       '@fastify/cors':
         specifier: ^10.0.2
         version: 10.0.2
-      '@shared/prisma':
-        specifier: workspace:^
-        version: link:../shared/prisma
       fastify:
         specifier: ^5.2.1
         version: 5.2.1
+      prisma:
+        specifier: workspace:^
+        version: link:../prisma
     devDependencies:
       '@types/node':
         specifier: ^22.13.0
@@ -58,7 +58,7 @@ importers:
         specifier: ^5.7.3
         version: 5.7.3
 
-  shared/prisma:
+  prisma:
     dependencies:
       '@prisma/client':
         specifier: ^6.3.1
@@ -82,12 +82,12 @@ importers:
       '@fastify/cors':
         specifier: ^10.0.2
         version: 10.0.2
-      '@shared/prisma':
-        specifier: workspace:^
-        version: link:../shared/prisma
       fastify:
         specifier: ^5.2.1
         version: 5.2.1
+      prisma:
+        specifier: workspace:^
+        version: link:../prisma
     devDependencies:
       '@types/node':
         specifier: ^22.13.1
@@ -107,9 +107,6 @@ importers:
       '@fastify/cors':
         specifier: ^10.0.2
         version: 10.0.2
-      '@shared/prisma':
-        specifier: workspace:^
-        version: link:../shared/prisma
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -119,6 +116,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
+      prisma:
+        specifier: workspace:^
+        version: link:../prisma
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6

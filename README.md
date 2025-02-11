@@ -13,6 +13,6 @@ docker compose up
 ### Update Prisma client
 
 ```bash
-cd shared/prisma
+cd prisma/
 pnpm generate
 ```
