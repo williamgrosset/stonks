@@ -1,7 +1,7 @@
 {
   "name": "stonks",
   "workspaces": [
-    "prisma",
+    "prisma-client",
     "user-service",
     "transaction-service",
     "order-service",

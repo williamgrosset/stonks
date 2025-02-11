@@ -1,7 +1,9 @@
 {
-  "name": "prisma",
+  "name": "prisma-client",
   "main": "dist/client.js",
+  "types": "dist/client.d.ts",
   "scripts": {
+    "build": "tsc",
     "generate": "prisma generate",
     "push": "prisma db push",
     "purge": "prisma db push --force-reset"

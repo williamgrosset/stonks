@@ -44,9 +44,9 @@ importers:
       fastify:
         specifier: ^5.2.1
         version: 5.2.1
-      prisma:
+      prisma-client:
         specifier: workspace:^
-        version: link:../prisma
+        version: link:../prisma-client
     devDependencies:
       '@types/node':
         specifier: ^22.13.0
@@ -58,7 +58,7 @@ importers:
         specifier: ^5.7.3
         version: 5.7.3
 
-  prisma:
+  prisma-client:
     dependencies:
       '@prisma/client':
         specifier: ^6.3.1
@@ -85,9 +85,9 @@ importers:
       fastify:
         specifier: ^5.2.1
         version: 5.2.1
-      prisma:
+      prisma-client:
         specifier: workspace:^
-        version: link:../prisma
+        version: link:../prisma-client
     devDependencies:
       '@types/node':
         specifier: ^22.13.1
@@ -116,9 +116,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
-      prisma:
+      prisma-client:
         specifier: workspace:^
-        version: link:../prisma
+        version: link:../prisma-client
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6

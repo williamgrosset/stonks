@@ -1,3 +1,3 @@
-import { prisma } from 'prisma/src/client'
+import { prisma } from 'prisma-client'
 
 export default prisma

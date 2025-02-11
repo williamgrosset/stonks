@@ -36,10 +36,10 @@ services:
       retries: 5
       start_period: 5s
 
-  prisma:
+  prisma-client:
     build:
       context: .
-      dockerfile: ./prisma/Dockerfile
+      dockerfile: ./prisma-client/Dockerfile
     depends_on:
       db:
         condition: service_healthy
@@ -70,7 +70,7 @@ services:
       dockerfile: ./user-service/Dockerfile
     container_name: user_service
     depends_on:
-      prisma:
+      prisma-client:
         condition: service_completed_successfully
     ports:
       - '3000:3000'
@@ -85,7 +85,7 @@ services:
       dockerfile: ./transaction-service/Dockerfile
     container_name: transaction_service
     depends_on:
-      prisma:
+      prisma-client:
         condition: service_completed_successfully
     ports:
       - '3001:3001'
@@ -100,7 +100,7 @@ services:
       dockerfile: ./order-service/Dockerfile
     container_name: order_service
     depends_on:
-      prisma:
+      prisma-client:
         condition: service_completed_successfully
       matching-engine-service:
         condition: service_started
