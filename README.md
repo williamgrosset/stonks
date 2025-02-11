@@ -9,10 +9,3 @@ a highly scalable & performant day trading system
 ```bash
 docker compose up
 ```
-
-### Update Prisma client
-
-```bash
-cd prisma-client/
-pnpm build && pnpm generate
-```
