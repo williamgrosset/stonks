@@ -5,63 +5,69 @@ import prisma from './prisma'
 
 const SECRET_KEY = 'supersecret'
 
-async function authRoutes(fastify: FastifyInstance) {
-  fastify.post<{ Body: { username: string; password: string } }>(
-    '/register',
-    async (request, reply) => {
-      try {
-        const { username, password } = request.body
-
-        if (!username || !password) {
-          return reply.status(400).send({ message: 'Missing fields' })
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10)
-
-        const user = await prisma.users.create({
-          data: {
-            user_name: username,
-            password: hashedPassword
-          },
-          select: {
-            id: true,
-            user_name: true
-          }
-        })
-
-        return reply.status(201).send({ user })
-      } catch (error) {
-        return reply.status(500).send({ message: 'Internal server error' })
-      }
-    }
-  )
-
-  fastify.post<{ Body: { username: string; password: string } }>(
-    '/login',
-    async (request, reply) => {
-      try {
-        const { username, password } = request.body
-
-        const user = await prisma.users.findUnique({
-          where: {
-            user_name: username
-          }
-        })
-
-        if (!user || !(await bcrypt.compare(password, user.password))) {
-          return reply.status(401).send({ message: 'Invalid credentials' })
-        }
-
-        const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
-          expiresIn: '1hr'
-        })
-
-        return reply.send({ token })
-      } catch (error) {
-        return reply.status(500).send({ message: 'Internal server error' })
-      }
-    }
-  )
+interface AuthBodyInput {
+  user_name: string
+  password: string
 }
 
-export default authRoutes
+interface RegisterBodyInput extends AuthBodyInput {
+  name?: string
+}
+
+async function routes(fastify: FastifyInstance) {
+  fastify.post<{ Body: RegisterBodyInput }>('/register', async (request, reply) => {
+    try {
+      const { user_name, password, name } = request.body
+
+      if (!user_name || !password) {
+        return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      await prisma.users.create({
+        data: {
+          user_name,
+          password: hashedPassword,
+          display_name: name
+        }
+      })
+
+      return reply.status(201).send({ success: true, data: null })
+    } catch (error) {
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
+    }
+  })
+
+  fastify.post<{ Body: AuthBodyInput }>('/login', async (request, reply) => {
+    try {
+      const { user_name, password } = request.body
+
+      const user = await prisma.users.findUnique({
+        where: {
+          user_name
+        }
+      })
+
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        return reply
+          .status(401)
+          .send({ success: false, data: null, message: 'Invalid credentials' })
+      }
+
+      const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
+        expiresIn: '1hr'
+      })
+
+      return reply.send({ success: true, data: { token } })
+    } catch (error) {
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
+    }
+  })
+}
+
+export default routes
