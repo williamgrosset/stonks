@@ -51,7 +51,7 @@ services:
 
   api-gateway:
     build:
-      context: ./nginx
+      context: ./api-gateway
       dockerfile: Dockerfile
     container_name: api_gateway
     restart: always
