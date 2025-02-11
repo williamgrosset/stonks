@@ -53,7 +53,7 @@ async function authRoutes(fastify: FastifyInstance) {
         }
 
         const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
-          expiresIn: '1d'
+          expiresIn: '1hr'
         })
 
         return reply.send({ token })
