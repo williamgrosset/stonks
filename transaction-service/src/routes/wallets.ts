@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify'
 import prisma from '../prisma'
 import { normalizeWalletTransaction } from '../normalize'
 
-async function walletsRoutes(fastify: FastifyInstance) {
+async function routes(fastify: FastifyInstance) {
   fastify.get('/wallets', async (request, reply) => {
     try {
       const user_id = request.headers['x-user-id'] as string
@@ -22,4 +22,4 @@ async function walletsRoutes(fastify: FastifyInstance) {
   })
 }
 
-export default walletsRoutes
+export default routes
