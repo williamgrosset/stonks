@@ -3,7 +3,7 @@ import prisma from '../prisma'
 import { normalizeWalletTransaction } from '../normalize'
 
 async function routes(fastify: FastifyInstance) {
-  fastify.get('/wallets', async (request, reply) => {
+  fastify.get('/transactions/wallets', async (request, reply) => {
     try {
       const user_id = request.headers['x-user-id'] as string
 

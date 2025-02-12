@@ -1,12 +1,13 @@
 export function normalizeStockTransaction(tx: any) {
-  const { id, user_id, ...rest } = tx
+  const { id, user_id, price, ...rest } = tx
 
   return {
     ...rest,
     stock_tx_id: tx.id,
     parent_tx_id: tx.parent_stock_transaction_id ?? null,
     wallet_tx_id: tx.wallet_transaction_id ?? null,
-    stock_price: Math.round(parseFloat(tx.price))
+    stock_price: Math.round(parseFloat(tx.price)),
+    is_buy: tx.order_type === 'LIMIT' ? true : false
   }
 }
 

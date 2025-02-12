@@ -3,7 +3,7 @@ import prisma from '../prisma'
 import { normalizeStockTransaction } from '../normalize'
 
 async function routes(fastify: FastifyInstance) {
-  fastify.get('/stocks', async (request, reply) => {
+  fastify.get('/transactions/stocks', async (request, reply) => {
     try {
       const user_id = request.headers['x-user-id'] as string
 
