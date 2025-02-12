@@ -1,21 +1,21 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import prisma from './prisma'
+import prisma from '../prisma'
 
 const SECRET_KEY = 'supersecret'
 
-interface AuthBodyInput {
+interface LoginBody {
   user_name: string
   password: string
 }
 
-interface RegisterBodyInput extends AuthBodyInput {
+interface RegisterBody extends LoginBody {
   name?: string
 }
 
 async function routes(fastify: FastifyInstance) {
-  fastify.post<{ Body: RegisterBodyInput }>('/register', async (request, reply) => {
+  fastify.post<{ Body: RegisterBody }>('/register', async (request, reply) => {
     try {
       const { user_name, password, name } = request.body
 
@@ -41,7 +41,7 @@ async function routes(fastify: FastifyInstance) {
     }
   })
 
-  fastify.post<{ Body: AuthBodyInput }>('/login', async (request, reply) => {
+  fastify.post<{ Body: LoginBody }>('/login', async (request, reply) => {
     try {
       const { user_name, password } = request.body
 

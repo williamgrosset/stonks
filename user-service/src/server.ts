@@ -1,11 +1,17 @@
 import Fastify from 'fastify'
-import routes from './routes'
+import authRoutes from './routes/auth'
+import setupRoutes from './routes/setup'
+import walletRoutes from './routes/wallet'
+import portfolioRoutes from './routes/portfolio'
 
 const PORT = process.env.PORT || 3000
 
 const fastify = Fastify({ logger: true })
 
-fastify.register(routes)
+fastify.register(authRoutes)
+fastify.register(setupRoutes)
+fastify.register(walletRoutes)
+fastify.register(portfolioRoutes)
 
 const start = async () => {
   try {
