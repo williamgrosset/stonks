@@ -1,52 +1,25 @@
 import { FastifyInstance } from 'fastify'
 import prisma from '../prisma'
+import { normalizeWalletTransaction } from '../normalize'
 
-const WALLET_TRANSACTIONS_PATH = '/transactions/wallets'
+async function walletsRoutes(fastify: FastifyInstance) {
+  fastify.get('/wallets', async (request, reply) => {
+    try {
+      const user_id = request.headers['x-user-id'] as string
 
-interface WalletTransactionInput {
-  user_id: number
-  amount: number
-  is_debit: boolean
+      const transactions = await prisma.wallet_transactions.findMany({
+        where: { user_id: parseInt(user_id) }
+      })
+
+      const formattedTransactions = transactions.map(normalizeWalletTransaction)
+
+      return reply.send({ success: true, data: formattedTransactions })
+    } catch (error) {
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Error fetching wallet transactions' })
+    }
+  })
 }
 
-async function walletTransactionRoutes(fastify: FastifyInstance) {
-  fastify.get<{ Querystring: { user_id?: string } }>(
-    WALLET_TRANSACTIONS_PATH,
-    async (request, reply) => {
-      try {
-        const { user_id } = request.query
-
-        const transactions = await prisma.wallet_transactions.findMany({
-          where: user_id ? { user_id: parseInt(user_id) } : undefined
-        })
-
-        return reply.send(transactions)
-      } catch (error) {
-        return reply.status(500).send({ error: 'Error fetching wallet transactions' })
-      }
-    }
-  )
-
-  fastify.post<{ Body: WalletTransactionInput }>(
-    WALLET_TRANSACTIONS_PATH,
-    async (request, reply) => {
-      try {
-        const { user_id, amount, is_debit } = request.body
-
-        const transaction = await prisma.wallet_transactions.create({
-          data: {
-            user_id,
-            amount,
-            is_debit
-          }
-        })
-
-        return reply.status(201).send(transaction)
-      } catch (error) {
-        return reply.status(500).send({ error: 'Error creating wallet transaction' })
-      }
-    }
-  )
-}
-
-export default walletTransactionRoutes
+export default walletsRoutes

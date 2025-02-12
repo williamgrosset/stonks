@@ -1,108 +1,25 @@
 import { FastifyInstance } from 'fastify'
 import prisma from '../prisma'
+import { normalizeStockTransaction } from '../normalize'
 
-const STOCK_TRANSACTIONS_PATH = '/transactions/stocks'
-
-interface StockTransactionInput {
-  stock_id: number
-  user_id: number
-  order_status: string
-  order_type: string
-  quantity: number
-  price: number
-  parent_stock_transaction_id?: number
-}
-
-async function stockTransactionRoutes(fastify: FastifyInstance) {
-  fastify.get<{ Querystring: { user_id?: string } }>(
-    STOCK_TRANSACTIONS_PATH,
-    async (request, reply) => {
-      try {
-        const { user_id } = request.query
-
-        const transactions = await prisma.stock_transactions.findMany({
-          where: user_id ? { user_id: parseInt(user_id) } : undefined
-        })
-
-        return reply.send(transactions)
-      } catch (error) {
-        return reply.status(500).send({ error: 'Error fetching stock transactions' })
-      }
-    }
-  )
-
-  fastify.post<{ Body: StockTransactionInput }>(STOCK_TRANSACTIONS_PATH, async (request, reply) => {
-    const {
-      stock_id,
-      user_id,
-      order_status,
-      order_type,
-      quantity,
-      price,
-      parent_stock_transaction_id
-    } = request.body
+async function stocksRoutes(fastify: FastifyInstance) {
+  fastify.get('/stocks', async (request, reply) => {
     try {
-      const transaction = await prisma.stock_transactions.create({
-        data: {
-          stock_id,
-          user_id,
-          order_status,
-          order_type,
-          quantity,
-          price,
-          parent_stock_transaction_id
-        }
+      const user_id = request.headers['x-user-id'] as string
+
+      const transactions = await prisma.stock_transactions.findMany({
+        where: { user_id: parseInt(user_id) }
       })
 
-      return reply.status(201).send(transaction)
+      const formattedTransactions = transactions.map(normalizeStockTransaction)
+
+      return reply.send({ success: true, data: formattedTransactions })
     } catch (error) {
-      return reply.status(500).send({ error: 'Error creating stock transaction' })
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Error fetching stock transactions' })
     }
   })
-
-  fastify.put<{ Params: { transaction_id: string }; Body: Partial<StockTransactionInput> }>(
-    `${STOCK_TRANSACTIONS_PATH}/:transaction_id`,
-    async (request, reply) => {
-      const { transaction_id } = request.params
-      const {
-        stock_id,
-        user_id,
-        order_status,
-        order_type,
-        quantity,
-        price,
-        parent_stock_transaction_id
-      } = request.body
-
-      try {
-        const existingTransaction = await prisma.stock_transactions.findUnique({
-          where: { transaction_id: Number(transaction_id) }
-        })
-
-        if (!existingTransaction) {
-          return reply.status(404).send({ error: 'Stock transaction not found' })
-        }
-
-        const updatedTransaction = await prisma.stock_transactions.update({
-          where: { transaction_id: Number(transaction_id) },
-          data: {
-            stock_id,
-            user_id,
-            order_status,
-            order_type,
-            quantity,
-            price,
-            parent_stock_transaction_id
-          }
-        })
-
-        return reply.status(200).send(updatedTransaction)
-      } catch (error) {
-        console.error(error)
-        return reply.status(500).send({ error: 'Error updating stock transaction' })
-      }
-    }
-  )
 }
 
-export default stockTransactionRoutes
+export default stocksRoutes
