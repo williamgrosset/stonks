@@ -73,7 +73,7 @@ async function routes(fastify: FastifyInstance) {
         })
 
         await ky.post('http://matching-engine:3003/orders/buy', {
-          json: { stock_id, user_id, quantity }
+          json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price }
         })
 
         return reply.status(200).send({ success: true, data: null })
@@ -89,9 +89,10 @@ async function routes(fastify: FastifyInstance) {
         }
 
         const transaction = await prisma.$transaction(async tx => {
+          // TODO: Should we delete shares if quantity is 0? Might make cancellation difficult
           await tx.shares.update({
             where: { id: userShares.id },
-            data: { quantity: userShares.quantity - quantity }
+            data: { quantity: { decrement: quantity } }
           })
 
           return tx.stock_transactions.create({

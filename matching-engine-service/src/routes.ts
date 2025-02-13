@@ -1,4 +1,5 @@
 import { FastifyInstance } from 'fastify'
+import ky from 'ky'
 import redis from './redis'
 
 interface SellOrderBody {
@@ -8,6 +9,11 @@ interface SellOrderBody {
   user_id: string
   quantity: number
   price: number
+}
+
+interface BuyOrderBody
+  extends Pick<SellOrderBody, 'stock_id' | 'stock_name' | 'user_id' | 'quantity'> {
+  deduction: number
 }
 
 async function routes(fastify: FastifyInstance) {
@@ -37,26 +43,65 @@ async function routes(fastify: FastifyInstance) {
     }
   })
 
-  // TODO: Handle partial order
-  fastify.post<{ Body: { stock: string } }>('/orders/buy', async (request, reply) => {
-    const { stock } = request.body
+  fastify.post<{ Body: BuyOrderBody }>('/orders/buy', async (request, reply) => {
+    try {
+      const { stock_id, stock_name, user_id, quantity, deduction } = request.body
 
-    if (!stock) {
-      return reply.status(400).send({ error: 'Stock is required' })
+      const sellOrderEntry = await redis.zrange(`sell_orders:${stock_id}`, 0, 0, 'WITHSCORES')
+
+      if (!sellOrderEntry.length) {
+        await ky.post('http://transaction-service/orders/refund', {
+          json: { user_id, amount: deduction }
+        })
+
+        return reply
+          .status(400)
+          .send({ success: false, data: null, message: 'No matching sell orders found' })
+      }
+
+      const sellOrderData = JSON.parse(sellOrderEntry[0])
+      const sellPrice = parseFloat(sellOrderEntry[1])
+
+      if (sellOrderData.quantity < quantity) {
+        await ky.post('http://transaction-service/orders/refund', {
+          json: { user_id, amount: deduction }
+        })
+
+        return reply
+          .status(400)
+          .send({ success: false, data: null, message: 'Not enough stock available' })
+      }
+
+      sellOrderData.quantity -= quantity
+
+      if (sellOrderData.quantity === 0) {
+        await redis.zpopmin(`sell_orders:${stock_id}`)
+      } else {
+        await redis.zadd(`sell_orders:${stock_id}`, sellPrice, JSON.stringify(sellOrderData))
+      }
+
+      const trade = {
+        buyer_id: user_id,
+        seller_id: sellOrderData.user_id,
+        stock_transaction_id: sellOrderData.stock_transaction_id,
+        stock_id,
+        stock_name,
+        price: sellPrice,
+        quantity,
+        is_partial: true
+      }
+
+      await ky.post('http://transaction-service/orders/complete', {
+        json: { trade }
+      })
+
+      return reply.send({ success: true, data: null })
+    } catch (error) {
+      console.error('Error processing buy order:', error)
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
     }
-
-    // Get the cheapest order from the ZSET
-    const orders = await redis.zrange(stock, 0, 0)
-
-    if (!orders || orders.length === 0) {
-      return reply.status(404).send({ error: 'No sell orders available for this stock' })
-    }
-
-    const order = JSON.parse(orders[0])
-
-    await redis.zrem(stock, orders[0])
-
-    return reply.send({ message: 'Buy order matched', order })
   })
 }
 
