@@ -16,6 +16,11 @@ interface BuyOrderBody
   deduction: number
 }
 
+interface CancelOrderBody {
+  stock_transaction_id: string
+  user_id: string
+}
+
 async function routes(fastify: FastifyInstance) {
   fastify.post<{ Body: SellOrderBody }>('/orders/sell', async (request, reply) => {
     try {
@@ -35,8 +40,11 @@ async function routes(fastify: FastifyInstance) {
 
       await redis.zadd(`sell_orders:${stock_id}`, price, JSON.stringify(order))
 
+      await redis.hset('sell_orders_index', stock_transaction_id, stock_id)
+
       return reply.send({ success: true, data: null })
     } catch (error) {
+      console.error('Error processing sell order:', error)
       return reply
         .status(500)
         .send({ success: false, data: null, message: 'Internal server error' })
@@ -76,6 +84,7 @@ async function routes(fastify: FastifyInstance) {
 
       if (sellOrderData.quantity === 0) {
         await redis.zpopmin(`sell_orders:${stock_id}`)
+        await redis.hdel('sell_orders_index', sellOrderData.stock_transaction_id)
       } else {
         await redis.zadd(`sell_orders:${stock_id}`, sellPrice, JSON.stringify(sellOrderData))
       }
@@ -98,6 +107,51 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error processing buy order:', error)
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
+    }
+  })
+
+  fastify.post<{ Body: CancelOrderBody }>('/orders/cancel', async (request, reply) => {
+    const { stock_transaction_id, user_id } = request.body
+
+    try {
+      const stock_id = await redis.hget('sell_orders_index', stock_transaction_id)
+
+      const sellOrders = await redis.zrange(`sell_orders:${stock_id}`, 0, -1, 'WITHSCORES')
+
+      let order = null
+
+      for (let i = 0; i < sellOrders.length; i += 2) {
+        const orderData = JSON.parse(sellOrders[i])
+
+        if (
+          orderData.stock_transaction_id === stock_transaction_id &&
+          orderData.user_id === user_id
+        ) {
+          order = orderData
+          break
+        }
+      }
+
+      if (!order) {
+        return reply
+          .status(404)
+          .send({ success: false, message: 'Order not found or already executed' })
+      }
+
+      await redis.zrem(`sell_orders:${stock_id}`, JSON.stringify(order))
+
+      await redis.hdel('sell_orders_index', stock_transaction_id)
+
+      await ky.post('http://transaction-service/orders/cancel', {
+        json: { stock_transaction_id }
+      })
+
+      return reply.send({ success: true, data: null })
+    } catch (error) {
+      console.error('Error cancelling sell order:', error)
       return reply
         .status(500)
         .send({ success: false, data: null, message: 'Internal server error' })

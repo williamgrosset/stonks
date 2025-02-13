@@ -13,6 +13,10 @@ interface StockOrderBody {
   price?: number
 }
 
+interface CancelOrderBody {
+  stock_tx_id: string
+}
+
 async function routes(fastify: FastifyInstance) {
   fastify.post<{ Body: StockOrderBody }>('/orders', async (request, reply) => {
     const user_id = request.headers['x-user-id'] as string
@@ -126,6 +130,31 @@ async function routes(fastify: FastifyInstance) {
         data: null,
         message: 'Must provide a valid buy order or sell order'
       })
+    } catch (error) {
+      console.error('Error processing order:', error)
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
+    }
+  })
+
+  fastify.post<{ Body: CancelOrderBody }>('/orders/cancel', async (request, reply) => {
+    const user_id = request.headers['x-user-id'] as string
+    const { stock_tx_id } = request.body
+
+    if (!stock_tx_id) {
+      return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+    }
+
+    try {
+      await ky.post('http://matching-engine:3003/orders/cancel', {
+        json: {
+          stock_transaction_id: stock_tx_id,
+          user_id
+        }
+      })
+
+      return reply.status(200).send({ success: true, data: null })
     } catch (error) {
       console.error('Error processing order:', error)
       return reply

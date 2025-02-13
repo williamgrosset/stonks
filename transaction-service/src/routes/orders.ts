@@ -1,9 +1,14 @@
 import { FastifyInstance } from 'fastify'
 import prisma from '../prisma'
+import { warn } from 'console'
 
 interface RefundOrderBody {
   user_id: string
   amount: number
+}
+
+interface CancelOrderBody {
+  stock_transaction_id: string
 }
 
 interface CompleteOrderBody {
@@ -21,9 +26,9 @@ interface CompleteOrderBody {
 
 async function routes(fastify: FastifyInstance) {
   fastify.post<{ Body: RefundOrderBody }>('/orders/refund', async (request, reply) => {
-    try {
-      const { user_id, amount } = request.body
+    const { user_id, amount } = request.body
 
+    try {
       await prisma.users.update({
         where: { id: parseInt(user_id) },
         data: {
@@ -40,10 +45,30 @@ async function routes(fastify: FastifyInstance) {
     }
   })
 
-  fastify.post<{ Body: CompleteOrderBody }>('/orders/complete', async (request, reply) => {
-    try {
-      const { trade } = request.body
+  fastify.post<{ Body: CancelOrderBody }>('/orders/cancel', async (request, reply) => {
+    const { stock_transaction_id } = request.body
 
+    try {
+      await prisma.stock_transactions.update({
+        where: { id: parseInt(stock_transaction_id) },
+        data: {
+          order_status: 'CANCELLED'
+        }
+      })
+
+      return reply.send({ success: true, data: null })
+    } catch (error) {
+      console.error('Error cancelling order:', error)
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
+    }
+  })
+
+  fastify.post<{ Body: CompleteOrderBody }>('/orders/complete', async (request, reply) => {
+    const { trade } = request.body
+
+    try {
       const transaction = await prisma.$transaction(async tx => {
         // ---------- BUYER -----------
         // Add shares to user
