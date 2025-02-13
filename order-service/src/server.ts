@@ -1,11 +1,13 @@
 import Fastify from 'fastify'
 import pricesRoutes from './routes/prices'
+import orderRoutes from './routes/orders'
 
 const PORT = process.env.PORT || 3002
 
 const fastify = Fastify({ logger: true })
 
 fastify.register(pricesRoutes)
+fastify.register(orderRoutes)
 
 const start = async () => {
   try {
