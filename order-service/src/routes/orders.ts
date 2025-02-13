@@ -73,7 +73,7 @@ async function routes(fastify: FastifyInstance) {
         })
 
         await ky.post('http://matching-engine:3003/orders/buy', {
-          json: { stock_id, user_id, order_type, quantity }
+          json: { stock_id, user_id, quantity }
         })
 
         return reply.status(200).send({ success: true, data: null })
@@ -88,7 +88,7 @@ async function routes(fastify: FastifyInstance) {
             .send({ success: false, data: null, message: 'Insufficient shares' })
         }
 
-        await prisma.$transaction(async tx => {
+        const transaction = await prisma.$transaction(async tx => {
           await tx.shares.update({
             where: { id: userShares.id },
             data: { quantity: userShares.quantity - quantity }
@@ -107,7 +107,14 @@ async function routes(fastify: FastifyInstance) {
         })
 
         await ky.post('http://matching-engine:3003/orders/sell', {
-          json: { stock_id, user_id, order_type, quantity, price }
+          json: {
+            stock_transaction_id: transaction.id,
+            stock_id,
+            stock_name: stock.stock_name,
+            user_id,
+            quantity,
+            price
+          }
         })
 
         return reply.status(200).send({ success: true, data: null })

@@ -1,27 +1,44 @@
 import { FastifyInstance } from 'fastify'
 import redis from './redis'
 
-async function routes(fastify: FastifyInstance) {
-  fastify.post<{ Body: { stock: string; price: number; quantity: number; seller: string } }>(
-    '/sell',
-    async (request, reply) => {
-      const { stock, price, quantity, seller } = request.body
+interface SellOrderBody {
+  stock_transaction_id: string
+  stock_id: string
+  stock_name: string
+  user_id: string
+  quantity: number
+  price: number
+}
 
-      if (!stock || !price || !quantity || !seller) {
-        return reply.status(400).send({ error: 'Missing required fields' })
+async function routes(fastify: FastifyInstance) {
+  fastify.post<{ Body: SellOrderBody }>('/orders/sell', async (request, reply) => {
+    try {
+      const { stock_transaction_id, stock_id, stock_name, user_id, quantity, price } = request.body
+
+      const order = {
+        stock_transaction_id,
+        stock_id,
+        stock_name,
+        user_id,
+        quantity,
+        price,
+        timestamp: Date.now()
       }
 
-      const order = { stock, price, quantity, seller, timestamp: Date.now() }
+      await redis.sadd('stocks', stock_id)
 
-      // Store order in Redis ZSET (price as the score)
-      await redis.zadd(stock, price, JSON.stringify(order))
+      await redis.zadd(`sell_orders:${stock_id}`, price, JSON.stringify(order))
 
-      return reply.send({ message: 'Sell order placed', order })
+      return reply.send({ success: true, data: null })
+    } catch (error) {
+      return reply
+        .status(500)
+        .send({ success: false, data: null, message: 'Internal server error' })
     }
-  )
+  })
 
   // TODO: Handle partial order
-  fastify.post<{ Body: { stock: string } }>('/buy', async (request, reply) => {
+  fastify.post<{ Body: { stock: string } }>('/orders/buy', async (request, reply) => {
     const { stock } = request.body
 
     if (!stock) {

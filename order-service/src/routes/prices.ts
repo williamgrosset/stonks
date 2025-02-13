@@ -4,7 +4,7 @@ import redis from '../redis'
 async function routes(fastify: FastifyInstance) {
   fastify.get('/stocks/prices', async (request, reply) => {
     try {
-      const stockIds = await redis.smembers('stocks:set')
+      const stockIds = await redis.smembers('stocks')
 
       if (!stockIds.length) {
         return reply.send([])
