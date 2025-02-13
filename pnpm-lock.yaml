@@ -44,6 +44,9 @@ importers:
       fastify:
         specifier: ^5.2.1
         version: 5.2.1
+      ioredis:
+        specifier: ^5.5.0
+        version: 5.5.0
       prisma-client:
         specifier: workspace:^
         version: link:../prisma-client

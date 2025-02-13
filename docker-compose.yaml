@@ -104,10 +104,13 @@ services:
         condition: service_completed_successfully
       matching-engine-service:
         condition: service_started
+      redis:
+        condition: service_healthy
     ports:
       - '3002:3002'
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      REDIS_URL: redis://redis:6379
     networks:
       - internal_network
 
