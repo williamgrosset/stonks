@@ -17,7 +17,7 @@ export function normalizeWalletTransaction(tx: any) {
   return {
     ...rest,
     wallet_tx_id: tx.id,
-    stock_tx_id: tx.stock_transaction ? tx.stock_transaction_id : null,
+    stock_tx_id: tx.stock_transaction ? tx.stock_transaction.id : null,
     amount: Math.round(parseFloat(tx.amount))
   }
 }
