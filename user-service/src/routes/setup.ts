@@ -44,13 +44,44 @@ async function routes(fastify: FastifyInstance) {
         return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
       }
 
+      const stockIdInt = parseInt(stock_id)
+      const userIdInt = parseInt(user_id)
+
       await prisma.shares.create({
         data: {
-          stock_id: parseInt(stock_id),
-          user_id: parseInt(user_id),
+          stock_id: stockIdInt,
+          user_id: userIdInt,
           quantity
         }
       })
+
+      // TODO: Schema should enforce only one record
+      const share = await prisma.shares.findFirstOrThrow({
+        where: {
+          stock_id: stockIdInt,
+          user_id: userIdInt
+        }
+      })
+
+      if (share) {
+        await prisma.shares.updateMany({
+          where: {
+            stock_id: stockIdInt,
+            user_id: userIdInt
+          },
+          data: {
+            quantity: share.quantity + quantity
+          }
+        })
+      } else {
+        await prisma.shares.create({
+          data: {
+            stock_id: stockIdInt,
+            user_id: userIdInt,
+            quantity
+          }
+        })
+      }
 
       return reply.status(201).send({ success: true, data: null })
     } catch (error) {
