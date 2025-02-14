@@ -1,7 +1,13 @@
-export function normalizeShare(share: any) {
+interface NormalizedShare {
+  stock_id: string
+  stock_name: string
+  quantity_owned: number
+}
+
+export function normalizeShare(share: any): NormalizedShare {
   return {
-    stock_id: share.id,
+    stock_id: share.stock_id,
     stock_name: share.stock.stock_name,
-    quantity_owned: Math.round(share.quantity)
+    quantity_owned: share.quantity
   }
 }
