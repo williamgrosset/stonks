@@ -12,7 +12,7 @@ model users {
   user_name      String  @unique @db.VarChar(255)
   password       String
   display_name   String? @db.VarChar(255)
-  wallet_balance Int
+  wallet_balance Int     @default(0)
 
   stocks              stocks[]
   shares              shares[]
