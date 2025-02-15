@@ -55,35 +55,26 @@ async function routes(fastify: FastifyInstance) {
         }
       })
 
-      // TODO: Schema should enforce only one record
-      const share = await prisma.shares.findFirstOrThrow({
+      await prisma.shares.upsert({
         where: {
+          stock_id_user_id: {
+            stock_id: stockIdInt,
+            user_id: userIdInt
+          }
+        },
+        update: {
+          quantity: {
+            increment: quantity
+          }
+        },
+        create: {
           stock_id: stockIdInt,
-          user_id: userIdInt
+          user_id: userIdInt,
+          quantity: quantity
         }
       })
 
-      if (share) {
-        await prisma.shares.updateMany({
-          where: {
-            stock_id: stockIdInt,
-            user_id: userIdInt
-          },
-          data: {
-            quantity: share.quantity + quantity
-          }
-        })
-      } else {
-        await prisma.shares.create({
-          data: {
-            stock_id: stockIdInt,
-            user_id: userIdInt,
-            quantity
-          }
-        })
-      }
-
-      return reply.status(201).send({ success: true, data: null })
+      return reply.send({ success: true, data: null })
     } catch (error) {
       return reply
         .status(500)
