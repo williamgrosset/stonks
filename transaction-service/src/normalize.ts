@@ -6,7 +6,7 @@ export function normalizeStockTransaction(tx: any) {
     stock_tx_id: tx.id,
     parent_tx_id: tx.parent_stock_transaction_id ?? null,
     wallet_tx_id: tx.wallet_transaction_id ?? null,
-    stock_price: Math.round(parseFloat(tx.price)),
+    stock_price: tx.price,
     is_buy: tx.order_type === 'LIMIT' ? true : false
   }
 }
@@ -17,7 +17,6 @@ export function normalizeWalletTransaction(tx: any) {
   return {
     ...rest,
     wallet_tx_id: tx.id,
-    stock_tx_id: tx.stock_transaction ? tx.stock_transaction.id : null,
-    amount: Math.round(parseFloat(tx.amount))
+    stock_tx_id: tx.stock_transaction ? tx.stock_transaction.id : null
   }
 }
