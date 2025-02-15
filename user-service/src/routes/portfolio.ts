@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { prisma } from 'prisma-client'
-import { normalizeShare } from '../normalize'
+import { normalizeShare } from '../normalize.js'
 
 async function routes(fastify: FastifyInstance) {
   fastify.get('/users/portfolio', async (request, reply) => {

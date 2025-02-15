@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import prisma from '../prisma'
+import prisma from '../prisma.js'
 
 const SECRET_KEY = 'supersecret'
 

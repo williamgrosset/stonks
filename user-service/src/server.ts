@@ -1,8 +1,8 @@
 import Fastify from 'fastify'
-import authRoutes from './routes/auth'
-import setupRoutes from './routes/setup'
-import walletRoutes from './routes/wallet'
-import portfolioRoutes from './routes/portfolio'
+import authRoutes from './routes/auth.js'
+import setupRoutes from './routes/setup.js'
+import walletRoutes from './routes/wallet.js'
+import portfolioRoutes from './routes/portfolio.js'
 
 const PORT = process.env.PORT || 3000
 
