@@ -59,7 +59,7 @@ async function routes(fastify: FastifyInstance) {
 
         const lowestSellOrder = JSON.parse(orderData[0])
         const price = lowestSellOrder.price * quantity
-        const currBalance = user.wallet_balance.toNumber()
+        const currBalance = user.wallet_balance
 
         if (currBalance < price) {
           return reply
