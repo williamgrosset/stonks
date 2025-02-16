@@ -117,12 +117,9 @@ async function routes(fastify: FastifyInstance) {
         return reply.status(200).send({ success: true, data: null })
       }
 
-      return reply.status(400).send({
-        success: true,
-        data: {
-          error: 'Must provide a valid buy order or sell order'
-        }
-      })
+      return reply
+        .status(400)
+        .send({ success: false, data: { error: 'Provide a valid buy order or sell order' } })
     } catch (error) {
       console.error('Error processing order:', error)
       return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
