@@ -55,8 +55,8 @@ async function routes(fastify: FastifyInstance) {
 
       const sellOrder = await redis.zrange(`sell_orders:${stock_id}`, 0, 0)
 
-      if (!sellOrder.length) {
-        await ky.post('http://transaction-service/orders/refund', {
+      if (sellOrder.length === 0) {
+        await ky.post('http://transaction-service:3001/orders/refund', {
           json: { user_id, amount: deduction }
         })
 
@@ -68,7 +68,7 @@ async function routes(fastify: FastifyInstance) {
       const sellOrderData = JSON.parse(sellOrder[0])
 
       if (sellOrderData.user_id === user_id) {
-        await ky.post('http://transaction-service/orders/refund', {
+        await ky.post('http://transaction-service:3001/orders/refund', {
           json: { user_id, amount: deduction }
         })
 
@@ -78,7 +78,7 @@ async function routes(fastify: FastifyInstance) {
       }
 
       if (sellOrderData.quantity < quantity) {
-        await ky.post('http://transaction-service/orders/refund', {
+        await ky.post('http://transaction-service:3001/orders/refund', {
           json: { user_id, amount: deduction }
         })
 
@@ -113,7 +113,7 @@ async function routes(fastify: FastifyInstance) {
         is_partial: isPartial
       }
 
-      await ky.post('http://transaction-service/orders/complete', {
+      await ky.post('http://transaction-service:3001/orders/complete', {
         json: { trade }
       })
 
@@ -156,7 +156,7 @@ async function routes(fastify: FastifyInstance) {
 
       await redis.hdel('sell_orders_index', stock_transaction_id)
 
-      await ky.post('http://transaction-service/orders/cancel', {
+      await ky.post('http://transaction-service:3001/orders/cancel', {
         json: { stock_transaction_id }
       })
 
