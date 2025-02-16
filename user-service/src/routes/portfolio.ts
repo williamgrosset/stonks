@@ -15,6 +15,11 @@ async function routes(fastify: FastifyInstance) {
               stock_name: true
             }
           }
+        },
+        orderBy: {
+          stock: {
+            stock_name: 'desc'
+          }
         }
       })
 
