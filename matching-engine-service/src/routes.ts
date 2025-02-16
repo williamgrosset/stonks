@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import ky from 'ky'
-import redis from './redis'
+import redis from './redis.js'
 
 interface SellOrderBody {
   stock_transaction_id: string

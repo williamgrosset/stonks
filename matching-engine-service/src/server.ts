@@ -1,5 +1,5 @@
 import Fastify from 'fastify'
-import routes from './routes'
+import routes from './routes.js'
 
 const PORT = process.env.PORT || 3003
 
