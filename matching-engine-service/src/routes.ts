@@ -45,9 +45,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error processing sell order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -122,9 +120,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error processing buy order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -167,9 +163,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error cancelling sell order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 }

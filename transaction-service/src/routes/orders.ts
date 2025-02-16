@@ -38,9 +38,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error issuing refund:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -58,9 +56,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error cancelling order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -164,9 +160,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.send({ success: true, data: transaction })
     } catch (error) {
       console.error('Error completing order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 }

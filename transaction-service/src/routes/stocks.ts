@@ -17,7 +17,7 @@ async function routes(fastify: FastifyInstance) {
     } catch (error) {
       return reply
         .status(500)
-        .send({ success: false, data: null, message: 'Error fetching stock transactions' })
+        .send({ success: false, data: { error: 'Error fetching stock transactions' } })
     }
   })
 }

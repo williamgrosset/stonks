@@ -29,7 +29,7 @@ async function routes(fastify: FastifyInstance) {
       reply.send({ success: true, data: stockPrices })
     } catch (error) {
       console.error('Error fetching stock prices:', error)
-      reply.status(500).send({ success: false, data: null, message: 'Internal Server Error' })
+      reply.status(500).send({ success: false, data: { error: 'Internal Server Error' } })
     }
   })
 }

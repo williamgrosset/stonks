@@ -29,13 +29,13 @@ async function routes(fastify: FastifyInstance) {
     if (order_type === 'MARKET' && price) {
       return reply
         .status(400)
-        .send({ success: false, data: null, message: 'Price field not permitted with a buy order' })
+        .send({ success: false, data: { error: 'Price field not permitted with a buy order' } })
     }
 
     if (order_type === 'LIMIT' && !price) {
       return reply
         .status(400)
-        .send({ success: false, data: null, message: 'Price field required with a sell order' })
+        .send({ success: false, data: { error: 'Price field required with a sell order' } })
     }
 
     try {
@@ -53,16 +53,14 @@ async function routes(fastify: FastifyInstance) {
         if (orderData.length === 0) {
           return reply
             .status(400)
-            .send({ success: false, data: null, message: 'No available sell orders' })
+            .send({ success: false, data: { error: 'No available sell orders' } })
         }
 
         const lowestSellOrder = JSON.parse(orderData[0])
         const price = lowestSellOrder.price * quantity
 
         if (user.wallet_balance < price) {
-          return reply
-            .status(400)
-            .send({ success: false, data: null, message: 'Insufficient funds' })
+          return reply.status(400).send({ success: false, data: { error: 'Insufficient funds' } })
         }
 
         await prisma.users.update({
@@ -83,9 +81,7 @@ async function routes(fastify: FastifyInstance) {
         })
 
         if (!shares || shares.quantity < quantity) {
-          return reply
-            .status(400)
-            .send({ success: false, data: null, message: 'Insufficient shares' })
+          return reply.status(400).send({ success: false, data: { error: 'Insufficient shares' } })
         }
 
         // Deduct user shares and create stock transaction
@@ -123,14 +119,13 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(400).send({
         success: true,
-        data: null,
-        message: 'Must provide a valid buy order or sell order'
+        data: {
+          error: 'Must provide a valid buy order or sell order'
+        }
       })
     } catch (error) {
       console.error('Error processing order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -139,7 +134,7 @@ async function routes(fastify: FastifyInstance) {
     const { stock_tx_id } = request.body
 
     if (!stock_tx_id) {
-      return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+      return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
     }
 
     try {
@@ -153,9 +148,7 @@ async function routes(fastify: FastifyInstance) {
       return reply.status(200).send({ success: true, data: null })
     } catch (error) {
       console.error('Error processing order:', error)
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 }
