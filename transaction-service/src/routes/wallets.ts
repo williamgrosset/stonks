@@ -15,6 +15,9 @@ async function routes(fastify: FastifyInstance) {
               id: true
             }
           }
+        },
+        orderBy: {
+          time_stamp: 'asc'
         }
       })
 

@@ -8,7 +8,10 @@ async function routes(fastify: FastifyInstance) {
       const user_id = request.headers['x-user-id'] as string
 
       const transactions = await prisma.stock_transactions.findMany({
-        where: { user_id: parseInt(user_id) }
+        where: { user_id: parseInt(user_id) },
+        orderBy: {
+          time_stamp: 'asc'
+        }
       })
 
       const formattedTransactions = transactions.map(normalizeStockTransaction)
