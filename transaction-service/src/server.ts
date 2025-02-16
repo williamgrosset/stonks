@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import stocksRoutes from './routes/stocks.js'
 import walletsRoutes from './routes/wallets.js'
+import ordersRoutes from './routes/orders.js'
 
 const PORT = process.env.PORT || 3001
 
@@ -8,6 +9,7 @@ const fastify = Fastify({ logger: true })
 
 fastify.register(stocksRoutes)
 fastify.register(walletsRoutes)
+fastify.register(ordersRoutes)
 
 const start = async () => {
   try {

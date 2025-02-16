@@ -92,8 +92,8 @@ async function routes(fastify: FastifyInstance) {
         const buyerWalletTx = await tx.wallet_transactions.create({
           data: {
             user_id: buyerIdInt,
-            is_debit: false,
-            amount: trade.price
+            is_debit: true,
+            amount: trade.price * trade.quantity
           }
         })
 
@@ -123,8 +123,8 @@ async function routes(fastify: FastifyInstance) {
         const sellerWalletTx = await tx.wallet_transactions.create({
           data: {
             user_id: sellerIdInt,
-            is_debit: true,
-            amount: trade.price
+            is_debit: false,
+            amount: trade.price * trade.quantity
           }
         })
 
