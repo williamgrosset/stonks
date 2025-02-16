@@ -43,16 +43,16 @@ model shares {
 }
 
 model stock_transactions {
-  id                          Int      @id @default(autoincrement())
+  id                          Int         @id @default(autoincrement())
   parent_stock_transaction_id Int?
-  wallet_transaction_id       Int?     @unique
+  wallet_transaction_id       Int?        @unique
   stock_id                    Int
   user_id                     Int
-  order_status                String
-  order_type                  String
+  order_status                OrderStatus
+  order_type                  OrderType
   quantity                    Int
   price                       Int
-  time_stamp                  DateTime @default(now()) @db.Timestamptz
+  time_stamp                  DateTime    @default(now()) @db.Timestamptz
 
   stock              stocks               @relation(fields: [stock_id], references: [id])
   user               users                @relation(fields: [user_id], references: [id])
@@ -70,4 +70,16 @@ model wallet_transactions {
 
   stock_transaction stock_transactions?
   user              users               @relation(fields: [user_id], references: [id])
+}
+
+enum OrderStatus {
+  CANCELLED
+  COMPLETED
+  IN_PROGRESS
+  PARTIALLY_COMPLETE
+}
+
+enum OrderType {
+  MARKET
+  LIMIT
 }
