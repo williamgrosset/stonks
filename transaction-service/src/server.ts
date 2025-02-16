@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
-import stocksRoutes from './routes/stocks'
-import walletsRoutes from './routes/wallets'
+import stocksRoutes from './routes/stocks.js'
+import walletsRoutes from './routes/wallets.js'
 
 const PORT = process.env.PORT || 3001
 

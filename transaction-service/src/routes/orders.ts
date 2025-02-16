@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import prisma from '../prisma'
-import { warn } from 'console'
+import prisma from '../prisma.js'
 
 interface RefundOrderBody {
   user_id: string

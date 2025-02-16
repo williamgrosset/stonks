@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import prisma from '../prisma'
-import { normalizeStockTransaction } from '../normalize'
+import prisma from '../prisma.js'
+import { normalizeStockTransaction } from '../normalize.js'
 
 async function routes(fastify: FastifyInstance) {
   fastify.get('/transactions/stocks', async (request, reply) => {
