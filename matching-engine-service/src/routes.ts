@@ -69,6 +69,16 @@ async function routes(fastify: FastifyInstance) {
 
       const sellOrderData = JSON.parse(sellOrder[0])
 
+      if (sellOrderData.user_id === user_id) {
+        await ky.post('http://transaction-service/orders/refund', {
+          json: { user_id, amount: deduction }
+        })
+
+        return reply
+          .status(400)
+          .send({ success: false, data: null, message: 'User cannot buy their own sell order' })
+      }
+
       if (sellOrderData.quantity < quantity) {
         await ky.post('http://transaction-service/orders/refund', {
           json: { user_id, amount: deduction }
@@ -79,6 +89,7 @@ async function routes(fastify: FastifyInstance) {
           .send({ success: false, data: null, message: 'Not enough stock available' })
       }
 
+      let isPartial = false
       sellOrderData.quantity -= quantity
 
       if (sellOrderData.quantity === 0) {
@@ -90,6 +101,7 @@ async function routes(fastify: FastifyInstance) {
           sellOrderData.price,
           JSON.stringify(sellOrderData)
         )
+        isPartial = true
       }
 
       const trade = {
@@ -100,7 +112,7 @@ async function routes(fastify: FastifyInstance) {
         stock_name,
         price: sellOrderData.price,
         quantity,
-        is_partial: true
+        is_partial: isPartial
       }
 
       await ky.post('http://transaction-service/orders/complete', {
