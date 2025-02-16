@@ -105,7 +105,7 @@ async function routes(fastify: FastifyInstance) {
 
         await ky.post('http://matching-engine-service:3003/orders/sell', {
           json: {
-            stock_transaction_id: transaction.id,
+            stock_transaction_id: transaction.id.toString(),
             stock_id,
             stock_name: stock.stock_name,
             user_id,
@@ -114,7 +114,7 @@ async function routes(fastify: FastifyInstance) {
           }
         })
 
-        return reply.status(200).send({ success: true, data: null })
+        return reply.send({ success: true, data: null })
       }
 
       return reply
@@ -142,7 +142,7 @@ async function routes(fastify: FastifyInstance) {
         }
       })
 
-      return reply.status(200).send({ success: true, data: null })
+      return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error processing order:', error)
       return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
