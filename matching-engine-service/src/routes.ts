@@ -55,9 +55,9 @@ async function routes(fastify: FastifyInstance) {
     try {
       const { stock_id, stock_name, user_id, quantity, deduction } = request.body
 
-      const sellOrderEntry = await redis.zrange(`sell_orders:${stock_id}`, 0, 0, 'WITHSCORES')
+      const sellOrder = await redis.zrange(`sell_orders:${stock_id}`, 0, 0)
 
-      if (!sellOrderEntry.length) {
+      if (!sellOrder.length) {
         await ky.post('http://transaction-service/orders/refund', {
           json: { user_id, amount: deduction }
         })
@@ -67,8 +67,7 @@ async function routes(fastify: FastifyInstance) {
           .send({ success: false, data: null, message: 'No matching sell orders found' })
       }
 
-      const sellOrderData = JSON.parse(sellOrderEntry[0])
-      const sellPrice = parseFloat(sellOrderEntry[1])
+      const sellOrderData = JSON.parse(sellOrder[0])
 
       if (sellOrderData.quantity < quantity) {
         await ky.post('http://transaction-service/orders/refund', {
@@ -86,7 +85,11 @@ async function routes(fastify: FastifyInstance) {
         await redis.zpopmin(`sell_orders:${stock_id}`)
         await redis.hdel('sell_orders_index', sellOrderData.stock_transaction_id)
       } else {
-        await redis.zadd(`sell_orders:${stock_id}`, sellPrice, JSON.stringify(sellOrderData))
+        await redis.zadd(
+          `sell_orders:${stock_id}`,
+          sellOrderData.price,
+          JSON.stringify(sellOrderData)
+        )
       }
 
       const trade = {
@@ -95,7 +98,7 @@ async function routes(fastify: FastifyInstance) {
         stock_transaction_id: sellOrderData.stock_transaction_id,
         stock_id,
         stock_name,
-        price: sellPrice,
+        price: sellOrderData.price,
         quantity,
         is_partial: true
       }
@@ -119,11 +122,11 @@ async function routes(fastify: FastifyInstance) {
     try {
       const stock_id = await redis.hget('sell_orders_index', stock_transaction_id)
 
-      const sellOrders = await redis.zrange(`sell_orders:${stock_id}`, 0, -1, 'WITHSCORES')
+      const sellOrders = await redis.zrange(`sell_orders:${stock_id}`, 0, -1)
 
       let order = null
 
-      for (let i = 0; i < sellOrders.length; i += 2) {
+      for (let i = 0; i < sellOrders.length; i++) {
         const orderData = JSON.parse(sellOrders[i])
 
         if (

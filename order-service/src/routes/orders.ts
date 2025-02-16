@@ -40,8 +40,7 @@ async function routes(fastify: FastifyInstance) {
 
     try {
       const user = await prisma.users.findUniqueOrThrow({
-        where: { id: parseInt(user_id) },
-        include: { shares: true }
+        where: { id: parseInt(user_id) }
       })
 
       const stock = await prisma.stocks.findUniqueOrThrow({
@@ -59,20 +58,17 @@ async function routes(fastify: FastifyInstance) {
 
         const lowestSellOrder = JSON.parse(orderData[0])
         const price = lowestSellOrder.price * quantity
-        const currBalance = user.wallet_balance
 
-        if (currBalance < price) {
+        if (user.wallet_balance < price) {
           return reply
             .status(400)
             .send({ success: false, data: null, message: 'Insufficient funds' })
         }
 
-        const updatedBalance = currBalance - price
-
         await prisma.users.update({
           where: { id: parseInt(user_id) },
           data: {
-            wallet_balance: updatedBalance
+            wallet_balance: { decrement: price }
           }
         })
 
@@ -82,20 +78,20 @@ async function routes(fastify: FastifyInstance) {
 
         return reply.status(200).send({ success: true, data: null })
       } else if (!is_buy && order_type === 'LIMIT') {
-        const userShares = await prisma.shares.findFirst({
+        const shares = await prisma.shares.findFirst({
           where: { user_id: user.id, stock_id: stock.id }
         })
 
-        if (!userShares || userShares.quantity < quantity) {
+        if (!shares || shares.quantity < quantity) {
           return reply
             .status(400)
             .send({ success: false, data: null, message: 'Insufficient shares' })
         }
 
+        // Deduct user shares and create stock transaction
         const transaction = await prisma.$transaction(async tx => {
-          // TODO: Should we delete shares if quantity is 0? Might make cancellation difficult
           await tx.shares.update({
-            where: { id: userShares.id },
+            where: { id: shares.id },
             data: { quantity: { decrement: quantity } }
           })
 
