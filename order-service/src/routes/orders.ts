@@ -70,7 +70,7 @@ async function routes(fastify: FastifyInstance) {
           }
         })
 
-        await ky.post('http://matching-engine:3003/orders/buy', {
+        await ky.post('http://matching-engine-service:3003/orders/buy', {
           json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price }
         })
 
@@ -103,7 +103,7 @@ async function routes(fastify: FastifyInstance) {
           })
         })
 
-        await ky.post('http://matching-engine:3003/orders/sell', {
+        await ky.post('http://matching-engine-service:3003/orders/sell', {
           json: {
             stock_transaction_id: transaction.id,
             stock_id,
@@ -135,7 +135,7 @@ async function routes(fastify: FastifyInstance) {
     }
 
     try {
-      await ky.post('http://matching-engine:3003/orders/cancel', {
+      await ky.post('http://matching-engine-service:3003/orders/cancel', {
         json: {
           stock_transaction_id: stock_tx_id,
           user_id
