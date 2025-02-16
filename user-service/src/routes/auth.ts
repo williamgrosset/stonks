@@ -20,7 +20,7 @@ async function routes(fastify: FastifyInstance) {
       const { user_name, password, name } = request.body
 
       if (!user_name || !password) {
-        return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+        return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
       const hashedPassword = await bcrypt.hash(password, 10)
@@ -35,9 +35,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(201).send({ success: true, data: null })
     } catch (error) {
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -52,9 +50,7 @@ async function routes(fastify: FastifyInstance) {
       })
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
-        return reply
-          .status(401)
-          .send({ success: false, data: null, message: 'Invalid credentials' })
+        return reply.status(401).send({ success: false, data: { error: 'Invalid credentials' } })
       }
 
       const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
@@ -63,9 +59,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.send({ success: true, data: { token } })
     } catch (error) {
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 }

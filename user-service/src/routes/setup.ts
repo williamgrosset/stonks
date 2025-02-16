@@ -17,7 +17,7 @@ async function routes(fastify: FastifyInstance) {
       const { stock_name } = request.body
 
       if (!stock_name) {
-        return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+        return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
       const stock = await prisma.stocks.create({
@@ -29,9 +29,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(201).send({ success: true, data: { stock_id: stock.id } })
     } catch (error) {
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -41,19 +39,11 @@ async function routes(fastify: FastifyInstance) {
       const { stock_id, quantity } = request.body
 
       if (!stock_id || !quantity) {
-        return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+        return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
       const stockIdInt = parseInt(stock_id)
       const userIdInt = parseInt(user_id)
-
-      await prisma.shares.create({
-        data: {
-          stock_id: stockIdInt,
-          user_id: userIdInt,
-          quantity
-        }
-      })
 
       await prisma.shares.upsert({
         where: {
@@ -76,9 +66,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.send({ success: true, data: null })
     } catch (error) {
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 }

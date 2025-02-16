@@ -12,13 +12,13 @@ async function routes(fastify: FastifyInstance) {
       const { amount } = request.body
 
       if (!amount) {
-        return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
+        return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
       if (amount <= 0) {
         return reply
           .status(400)
-          .send({ success: false, data: null, message: 'Amount must be greater than 0' })
+          .send({ success: false, data: { error: 'Amount must be greater than 0' } })
       }
 
       await prisma.users.update({
@@ -32,9 +32,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(200).send({ success: true, data: null })
     } catch (error) {
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 
@@ -51,9 +49,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(200).send({ success: true, data: { balance: wallet_balance } })
     } catch (error) {
-      return reply
-        .status(500)
-        .send({ success: false, data: null, message: 'Internal server error' })
+      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
 }
