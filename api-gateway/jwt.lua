@@ -8,25 +8,16 @@ local function verify_jwt()
   ngx.log(ngx.ERR, "[JWT] running verify_jwt() middleware...")
 
   local headers = ngx.req.get_headers()
-  local token = headers["Authorization"]
+  local token = headers["token"]
 
   if not token then
-    ngx.log(ngx.ERR, "[JWT] Missing Authorization header")
+    ngx.log(ngx.ERR, "[JWT] Missing token header")
     ngx.status = ngx.HTTP_UNAUTHORIZED
-    ngx.say("{\"error\": \"Missing Authorization header\"}")
+    ngx.say("{\"error\": \"Missing token header\"}")
     return ngx.exit(ngx.HTTP_UNAUTHORIZED)
   end
 
-  local _, _, extracted_token = string.find(token, "Bearer%s+(.+)")
-
-  if not extracted_token then
-    ngx.log(ngx.ERR, "[JWT] Invalid Authorization format")
-    ngx.status = ngx.HTTP_UNAUTHORIZED
-    ngx.say("{\"error\": \"Invalid Authorization format\"}")
-    return ngx.exit(ngx.HTTP_UNAUTHORIZED)
-  end
-
-  local cached_user_id = jwt_cache:get(extracted_token)
+  local cached_user_id = jwt_cache:get(token)
 
   if cached_user_id then
     ngx.log(ngx.ERR, "[JWT] Token found in cache")
@@ -34,7 +25,7 @@ local function verify_jwt()
     return
   end
 
-  local jwt_obj = jwt:verify(SECRET_KEY, extracted_token)
+  local jwt_obj = jwt:verify(SECRET_KEY, token)
 
   if not jwt_obj.verified then
     ngx.log(ngx.ERR, "[JWT] Invalid JWT token")
@@ -52,7 +43,7 @@ local function verify_jwt()
     return ngx.exit(ngx.HTTP_UNAUTHORIZED)
   end
 
-  jwt_cache:set(extracted_token, user_id, 300)
+  jwt_cache:set(token, user_id, 300)
 
   ngx.req.set_header("X-User-ID", user_id)
 
