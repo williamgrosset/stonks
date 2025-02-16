@@ -7,7 +7,7 @@ async function routes(fastify: FastifyInstance) {
       const stockIds = await redis.smembers('stocks')
 
       if (!stockIds.length) {
-        return reply.send([])
+        return reply.send({ success: true, data: [] })
       }
 
       const stockPrices = await Promise.all(
@@ -32,10 +32,10 @@ async function routes(fastify: FastifyInstance) {
         .filter(Boolean)
         .sort((a, b) => b!.stock_name.localeCompare(a!.stock_name))
 
-      reply.send({ success: true, data: prices })
+      return reply.send({ success: true, data: prices })
     } catch (error) {
       console.error('Error fetching stock prices:', error)
-      reply.status(500).send({ success: false, data: { error: 'Internal Server Error' } })
+      return reply.status(500).send({ success: false, data: { error: 'Internal Server Error' } })
     }
   })
 }
