@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import redis from '../redis'
+import redis from '../redis.js'
 
 async function routes(fastify: FastifyInstance) {
   fastify.get('/stocks/prices', async (request, reply) => {

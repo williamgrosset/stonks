@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import ky from 'ky'
-import prisma from '../prisma'
-import redis from '../redis'
+import prisma from '../prisma.js'
+import redis from '../redis.js'
 
 type Order = 'LIMIT' | 'MARKET'
 

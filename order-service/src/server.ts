@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
-import pricesRoutes from './routes/prices'
-import orderRoutes from './routes/orders'
+import pricesRoutes from './routes/prices.js'
+import orderRoutes from './routes/orders.js'
 
 const PORT = process.env.PORT || 3002
 
