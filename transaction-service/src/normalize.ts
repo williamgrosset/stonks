@@ -8,7 +8,7 @@ interface NormalizedStockTransaction {
   quantity: number
   time_stamp: Date
   stock_tx_id: string
-  parent_tx_id: string | null
+  parent_stock_tx_id: string | null
   wallet_tx_id: string | null
   stock_id: string
   stock_price: number
@@ -29,11 +29,13 @@ export function normalizeStockTransaction(tx: StockTransaction): NormalizedStock
   return {
     ...rest,
     stock_tx_id: tx.id.toString(),
-    parent_tx_id: tx.parent_stock_transaction_id ? tx.parent_stock_transaction_id.toString() : null,
+    parent_stock_tx_id: tx.parent_stock_transaction_id
+      ? tx.parent_stock_transaction_id.toString()
+      : null,
     wallet_tx_id: tx.wallet_transaction_id ? tx.wallet_transaction_id.toString() : null,
     stock_id: tx.stock_id.toString(),
     stock_price: tx.price,
-    is_buy: tx.order_type === 'LIMIT' ? true : false
+    is_buy: tx.order_type === 'MARKET' ? true : false
   }
 }
 
