@@ -8,7 +8,7 @@ async function routes(fastify: FastifyInstance) {
       const user_id = request.headers['x-user-id'] as string
 
       const shares = await prisma.shares.findMany({
-        where: { user_id: parseInt(user_id) },
+        where: { user_id: parseInt(user_id), quantity: { gt: 0 } },
         include: {
           stock: {
             select: {
