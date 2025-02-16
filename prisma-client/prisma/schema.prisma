@@ -39,7 +39,7 @@ model shares {
   stock stocks @relation(fields: [stock_id], references: [id])
   user  users  @relation(fields: [user_id], references: [id])
 
-  @@unique([stock_id, user_id])
+  @@unique([stock_id, user_id], name: "stock_id_user_id")
 }
 
 model stock_transactions {
