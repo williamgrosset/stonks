@@ -33,7 +33,7 @@ async function routes(fastify: FastifyInstance) {
         user_id,
         quantity,
         price,
-        timestamp: Date.now()
+        time_stamp: Date.now()
       }
 
       await redis.sadd('stocks', stock_id)
@@ -94,6 +94,7 @@ async function routes(fastify: FastifyInstance) {
         await redis.zpopmin(`sell_orders:${stock_id}`)
         await redis.hdel('sell_orders_index', sellOrderData.stock_transaction_id)
       } else {
+        await redis.zrem(`sell_orders:${stock_id}`, sellOrder[0])
         await redis.zadd(
           `sell_orders:${stock_id}`,
           sellOrderData.price,
