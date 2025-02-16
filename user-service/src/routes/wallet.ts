@@ -15,6 +15,12 @@ async function routes(fastify: FastifyInstance) {
         return reply.status(400).send({ success: false, data: null, message: 'Missing fields' })
       }
 
+      if (amount <= 0) {
+        return reply
+          .status(400)
+          .send({ success: false, data: null, message: 'Amount must be greater than 0' })
+      }
+
       await prisma.users.update({
         where: { id: parseInt(user_id) },
         data: {
