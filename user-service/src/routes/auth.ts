@@ -35,7 +35,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(201).send({ success: true, data: null })
     } catch (error) {
-      return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
+      return reply.status(400).send({ success: false, data: { error: 'User already exists' } })
     }
   })
 
@@ -50,7 +50,7 @@ async function routes(fastify: FastifyInstance) {
       })
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
-        return reply.status(401).send({ success: false, data: { error: 'Invalid credentials' } })
+        return reply.status(400).send({ success: false, data: { error: 'Invalid credentials' } })
       }
 
       const token = jwt.sign({ user_id: user.id }, SECRET_KEY, {
