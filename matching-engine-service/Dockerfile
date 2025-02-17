@@ -11,10 +11,12 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 # Copy matching-engine-service into the image
 COPY matching-engine-service/ ./matching-engine-service/
 
-# Install all dependencies for the workspace
-RUN pnpm install --frozen-lockfile
+# Install all dependencies
+RUN pnpm install --frozen-lockfile \
+    && pnpm --filter matching-engine-service run build \
+    && pnpm prune --prod
 
 EXPOSE 3003
 
 # Run the Fastify server
-CMD ["sh", "-c", "pnpm --filter matching-engine-service run dev"]
+CMD ["pnpm", "--filter", "matching-engine-service", "start"]

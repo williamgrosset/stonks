@@ -12,13 +12,13 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 COPY prisma-client/ ./prisma-client/
 COPY user-service/ ./user-service/
 
-# Install all dependencies for the workspace
-RUN pnpm install --frozen-lockfile
-
-# Generate Prisma client
-RUN pnpm --filter prisma-client run generate
+# Install all dependencies
+RUN pnpm install --frozen-lockfile \
+    && pnpm --filter prisma-client run generate \
+    && pnpm --filter user-service run build \
+    && pnpm prune --prod
 
 EXPOSE 3000
 
 # Run the Fastify server
-CMD ["sh", "-c", "pnpm --filter user-service run dev"]
+CMD ["pnpm", "--filter", "user-service", "start"]
