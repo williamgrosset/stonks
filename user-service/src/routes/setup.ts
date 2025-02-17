@@ -60,7 +60,7 @@ async function routes(fastify: FastifyInstance) {
         create: {
           stock_id: stockIdInt,
           user_id: userIdInt,
-          quantity: quantity
+          quantity
         }
       })
 
