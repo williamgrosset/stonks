@@ -52,6 +52,14 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
+      - name: 🛠 Restore Prisma Client Cache
+        uses: actions/cache@v3
+        with:
+          path: prisma-client
+          key: ${{ runner.os }}-prisma-client-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-prisma-client-
+
       - name: 🏗️ Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -62,14 +70,6 @@ jobs:
 
       - name: 📦 Install dependencies
         run: pnpm install --recursive
-
-      - name: 🔄 Restore Prisma Client Cache
-        uses: actions/cache@v3
-        with:
-          path: prisma-client
-          key: ${{ runner.os }}-prisma-client-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-prisma-client-
 
       - name: 🏗️ Build service
         run: pnpm --filter=${{ matrix.service }} run build
