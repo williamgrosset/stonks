@@ -11,16 +11,14 @@ interface CancelOrderBody {
 }
 
 interface CompleteOrderBody {
-  trade: {
-    buyer_id: string
-    seller_id: string
-    stock_transaction_id: string
-    stock_id: string
-    stock_name: string
-    price: number
-    quantity: number
-    is_partial: boolean
-  }
+  buyer_id: string
+  seller_id: string
+  stock_transaction_id: string
+  stock_id: string
+  stock_name: string
+  price: number
+  quantity: number
+  is_partial: boolean
 }
 
 async function routes(fastify: FastifyInstance) {
@@ -61,11 +59,12 @@ async function routes(fastify: FastifyInstance) {
   })
 
   fastify.post<{ Body: CompleteOrderBody }>('/orders/complete', async (request, reply) => {
-    const { trade } = request.body
-    const stockIdInt = parseInt(trade.stock_id)
-    const buyerIdInt = parseInt(trade.buyer_id)
-    const sellerIdInt = parseInt(trade.seller_id)
-    const stockTransactionIdInt = parseInt(trade.stock_transaction_id)
+    const { buyer_id, seller_id, stock_transaction_id, stock_id, price, quantity, is_partial } =
+      request.body
+    const buyerIdInt = parseInt(buyer_id)
+    const sellerIdInt = parseInt(seller_id)
+    const stockTransactionIdInt = parseInt(stock_transaction_id)
+    const stockIdInt = parseInt(stock_id)
 
     try {
       const transaction = await prisma.$transaction(async tx => {
@@ -79,25 +78,25 @@ async function routes(fastify: FastifyInstance) {
             }
           },
           update: {
-            quantity: { increment: trade.quantity }
+            quantity: { increment: quantity }
           },
           create: {
             stock_id: stockIdInt,
             user_id: buyerIdInt,
-            quantity: trade.quantity
+            quantity
           }
         })
 
-        // Create deducted wallet transaction
+        // Create wallet transaction
         const buyerWalletTx = await tx.wallet_transactions.create({
           data: {
             user_id: buyerIdInt,
             is_debit: true,
-            amount: trade.price * trade.quantity
+            amount: price * quantity
           }
         })
 
-        // Create stock transaction
+        // Create `COMPLETED` stock transaction
         await tx.stock_transactions.create({
           data: {
             stock_id: stockIdInt,
@@ -105,8 +104,8 @@ async function routes(fastify: FastifyInstance) {
             wallet_transaction_id: buyerWalletTx.id,
             order_status: 'COMPLETED',
             order_type: 'MARKET',
-            quantity: trade.quantity,
-            price: trade.price
+            quantity,
+            price
           }
         })
 
@@ -115,21 +114,21 @@ async function routes(fastify: FastifyInstance) {
         await tx.users.update({
           where: { id: sellerIdInt },
           data: {
-            wallet_balance: { increment: trade.price * trade.quantity }
+            wallet_balance: { increment: price * quantity }
           }
         })
 
-        // Create debited wallet transaction
+        // Create wallet transaction
         const sellerWalletTx = await tx.wallet_transactions.create({
           data: {
             user_id: sellerIdInt,
             is_debit: false,
-            amount: trade.price * trade.quantity
+            amount: price * quantity
           }
         })
 
-        if (trade.is_partial) {
-          // Create child stock transaction
+        if (is_partial) {
+          // Create `COMPLETED` child stock transaction
           await tx.stock_transactions.create({
             data: {
               parent_stock_transaction_id: stockTransactionIdInt,
@@ -138,18 +137,18 @@ async function routes(fastify: FastifyInstance) {
               wallet_transaction_id: sellerWalletTx.id,
               order_status: 'COMPLETED',
               order_type: 'LIMIT',
-              quantity: trade.quantity,
-              price: trade.price
+              quantity,
+              price
             }
           })
 
-          // Update stock transaction to PARTIALLY_COMPLETE
+          // Update stock transaction to `PARTIALLY_COMPLETE`
           return await tx.stock_transactions.update({
             where: { id: stockTransactionIdInt },
             data: { order_status: 'PARTIALLY_COMPLETE' }
           })
         } else {
-          // Update stock transaction to COMPLETED
+          // Update stock transaction to `COMPLETED`
           return await tx.stock_transactions.update({
             where: { id: stockTransactionIdInt },
             data: { order_status: 'COMPLETED', wallet_transaction_id: sellerWalletTx.id }

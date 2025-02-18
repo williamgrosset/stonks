@@ -115,7 +115,7 @@ async function routes(fastify: FastifyInstance) {
       }
 
       await ky.post('http://transaction-service:3001/orders/complete', {
-        json: { trade }
+        json: { ...trade }
       })
 
       return reply.send({ success: true, data: null })

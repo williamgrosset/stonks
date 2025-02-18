@@ -98,16 +98,14 @@ describe('Orders Routes', () => {
       'http://transaction-service:3001/orders/complete',
       expect.objectContaining({
         json: {
-          trade: {
-            buyer_id: 'buyer123',
-            seller_id: 'seller123',
-            stock_transaction_id: 'txn123',
-            stock_id: 'stock123',
-            stock_name: 'Test Stock',
-            quantity: 5,
-            price: 100,
-            is_partial: true
-          }
+          buyer_id: 'buyer123',
+          seller_id: 'seller123',
+          stock_transaction_id: 'txn123',
+          stock_id: 'stock123',
+          stock_name: 'Test Stock',
+          quantity: 5,
+          price: 100,
+          is_partial: true
         }
       })
     )
@@ -148,16 +146,14 @@ describe('Orders Routes', () => {
       'http://transaction-service:3001/orders/complete',
       expect.objectContaining({
         json: {
-          trade: {
-            buyer_id: 'buyer123',
-            seller_id: 'seller123',
-            stock_transaction_id: 'txn123',
-            stock_id: 'stock123',
-            stock_name: 'Test Stock',
-            quantity: 10,
-            price: 100,
-            is_partial: false
-          }
+          buyer_id: 'buyer123',
+          seller_id: 'seller123',
+          stock_transaction_id: 'txn123',
+          stock_id: 'stock123',
+          stock_name: 'Test Stock',
+          quantity: 10,
+          price: 100,
+          is_partial: false
         }
       })
     )
