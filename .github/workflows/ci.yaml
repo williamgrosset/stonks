@@ -14,7 +14,11 @@ jobs:
     strategy:
       matrix:
         service:
-          [prisma-client, user-service, order-service, matching-engine-service, transaction-service]
+          - prisma-client
+          - user-service
+          - order-service
+          - matching-engine-service
+          - transaction-service
 
     steps:
       - name: 📥 Checkout repository
@@ -29,7 +33,10 @@ jobs:
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install --recursive
+        run: pnpm install
+
+      - name: 🏗️ Build Prisma client
+        run: pnpm --filter=prisma-client run generate
 
       - name: 🏗️ Build service
         run: pnpm --filter=${{ matrix.service }} run build
