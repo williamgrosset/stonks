@@ -14,11 +14,7 @@ jobs:
     strategy:
       matrix:
         service:
-          [user-service, order-service, matching-engine-service, transaction-service, prisma-client]
-
-    defaults:
-      run:
-        working-directory: ${{ matrix.service }}
+          [prisma-client, user-service, order-service, matching-engine-service, transaction-service]
 
     steps:
       - name: 📥 Checkout repository
@@ -32,16 +28,16 @@ jobs:
       - name: 📦 Install pnpm
         run: npm install -g pnpm
 
-      - name: 📦 Install dependencies (including prisma-client if needed)
-        run: pnpm install --filter ${{ matrix.service }}...
+      - name: 📦 Install dependencies
+        run: pnpm install
 
       - name: ⚡ Generate Prisma client
         if: contains(fromJson('["user-service", "order-service", "transaction-service"]'), matrix.service)
-        run: pnpm --filter prisma-client run generate
+        run: pnpm run generate --filter=prisma-client
 
       - name: 🏗️ Build service
-        run: pnpm build --filter ${{ matrix.service }}
+        run: pnpm run build --filter=${{ matrix.service }}
 
-      - name: 🧪 Run tests (only for matching-engine-service)
+      - name: 🧪 Run tests
         if: matrix.service == 'matching-engine-service'
-        run: pnpm test --filter ${{ matrix.service }}
+        run: pnpm run test --filter=${{ matrix.service }}
