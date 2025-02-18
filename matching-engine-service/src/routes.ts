@@ -150,7 +150,7 @@ async function routes(fastify: FastifyInstance) {
       if (!order) {
         return reply
           .status(404)
-          .send({ success: false, message: 'Order not found or already executed' })
+          .send({ success: false, data: { error: 'Order not found or already executed' } })
       }
 
       await redis.zrem(`sell_orders:${stock_id}`, JSON.stringify(order))
