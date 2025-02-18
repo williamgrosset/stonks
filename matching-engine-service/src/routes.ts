@@ -103,19 +103,17 @@ async function routes(fastify: FastifyInstance) {
         isPartial = true
       }
 
-      const trade = {
-        buyer_id: user_id,
-        seller_id: sellOrderData.user_id,
-        stock_transaction_id: sellOrderData.stock_transaction_id,
-        stock_id,
-        stock_name,
-        price: sellOrderData.price,
-        quantity,
-        is_partial: isPartial
-      }
-
       await ky.post('http://transaction-service:3001/orders/complete', {
-        json: { ...trade }
+        json: {
+          buyer_id: user_id,
+          seller_id: sellOrderData.user_id,
+          stock_transaction_id: sellOrderData.stock_transaction_id,
+          stock_id,
+          stock_name,
+          price: sellOrderData.price,
+          quantity,
+          is_partial: isPartial
+        }
       })
 
       return reply.send({ success: true, data: null })
