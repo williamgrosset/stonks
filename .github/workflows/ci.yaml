@@ -33,11 +33,11 @@ jobs:
 
       - name: ⚡ Generate Prisma client
         if: contains(fromJson('["user-service", "order-service", "transaction-service"]'), matrix.service)
-        run: pnpm run generate --filter=prisma-client
+        run: pnpm --filter=prisma-client run generate
 
       - name: 🏗️ Build service
-        run: pnpm run build --filter=${{ matrix.service }}
+        run: pnpm --filter=${{ matrix.service }} run build
 
       - name: 🧪 Run tests
         if: matrix.service == 'matching-engine-service'
-        run: pnpm run test --filter=${{ matrix.service }}
+        run: pnpm --filter=${{ matrix.service }} run test
