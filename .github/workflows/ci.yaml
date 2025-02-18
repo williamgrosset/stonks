@@ -26,7 +26,7 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install --recursive
 
-      - name: 🏗️ Build Prisma client
+      - name: 🏗️ Generate Prisma Client
         run: pnpm --filter=prisma-client run generate
 
       - name: 🛠 Cache Prisma Client
@@ -37,7 +37,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-prisma-client-
 
-  build:
+  build-services:
     needs: build-prisma-client
     runs-on: ubuntu-latest
     strategy:
