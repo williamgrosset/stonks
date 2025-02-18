@@ -4,7 +4,9 @@
   "types": "dist/client.d.ts",
   "scripts": {
     "build": "tsc",
+    "prepare": "pnpm run generate",
     "generate": "prisma generate",
+    "prepare": "pnpm run generate",
     "push": "prisma db push",
     "purge": "prisma db push --force-reset"
   },

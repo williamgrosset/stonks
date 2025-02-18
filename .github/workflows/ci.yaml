@@ -2,24 +2,13 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  build:
+  build-prisma-client:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service:
-          - prisma-client
-          - user-service
-          - order-service
-          - matching-engine-service
-          - transaction-service
-
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -35,8 +24,33 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install --recursive
 
-      - name: 🏗️ Generate Prisma Client
-        run: pnpm --filter=prisma-client run generate
+      - name: 🏗️ Build Prisma client
+        run: pnpm --filter=prisma-client run build
+
+  build-services:
+    needs: build-prisma-client
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - user-service
+          - order-service
+          - matching-engine-service
+          - transaction-service
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: 📦 Install pnpm
+        run: npm install -g pnpm
+
+      - name: 📦 Install dependencies
+        run: pnpm install --recursive
 
       - name: 🏗️ Build service
         run: pnpm --filter=${{ matrix.service }} run build
