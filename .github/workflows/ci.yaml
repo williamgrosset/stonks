@@ -38,9 +38,6 @@ jobs:
         working-directory: prisma-client
         run: pnpm run generate
 
-      - name: 🔄 Refresh workspace links
-        run: pnpm install --recursive --force
-
       - name: 🏗️ Build service
         working-directory: ${{ matrix.service }}
         run: pnpm run build
