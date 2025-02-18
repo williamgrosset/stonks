@@ -33,7 +33,11 @@ jobs:
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install --filter ${{ matrix.service }}...
+        run: pnpm install --filter ${{ matrix.service }}... --filter prisma-client
+
+      - name: ⚡ Generate Prisma Client
+        if: matrix.service != 'prisma-client'
+        run: pnpm --filter prisma-client run generate
 
       - name: 🏗️ Build service
         run: pnpm build
