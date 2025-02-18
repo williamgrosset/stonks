@@ -9,12 +9,16 @@ on:
       - main
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          [user-service, order-service, matching-engine-service, transaction-service, prisma-client]
 
     defaults:
       run:
-        working-directory: matching-engine-service
+        working-directory: ${{ matrix.service }}
 
     steps:
       - name: 📥 Checkout repository
@@ -31,5 +35,9 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🧪 Run tests
+      - name: 🏗️ Build service
+        run: pnpm build
+
+      - name: 🧪 Run tests (only matching-engine-service)
+        if: matrix.service == 'matching-engine-service'
         run: pnpm test
