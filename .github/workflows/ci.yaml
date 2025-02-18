@@ -28,16 +28,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: 'pnpm'
 
       - name: 📦 Install pnpm
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install --filter . --frozen-lockfile
+        run: pnpm install --filter ${{ matrix.service }}...
 
       - name: 🏗️ Build service
         run: pnpm build
 
-      - name: 🧪 Run tests (only matching-engine-service)
+      - name: 🧪 Run tests (only for matching-engine-service)
         if: matrix.service == 'matching-engine-service'
         run: pnpm test
