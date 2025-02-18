@@ -12,6 +12,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: matching-engine-service
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
@@ -22,11 +26,11 @@ jobs:
           node-version: 18
           cache: 'pnpm'
 
-      - name: 📦 Install pnpm
-        run: npm install -g pnpm
+      - name: 📦 Enable Corepack (Ensures pnpm is available)
+        run: corepack enable
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: 🧪 Run tests
         run: pnpm test
