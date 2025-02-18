@@ -31,10 +31,6 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install
 
-      - name: ⚡ Generate Prisma client
-        if: contains(fromJson('["user-service", "order-service", "transaction-service"]'), matrix.service)
-        run: pnpm --filter=prisma-client run generate
-
       - name: 🏗️ Build service
         run: pnpm --filter=${{ matrix.service }} run build
 
