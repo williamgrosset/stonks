@@ -35,8 +35,26 @@ jobs:
       - name: 📦 Install dependencies
         run: pnpm install --recursive
 
+      - name: 🔍 Show Installed Node Modules
+        run: ls -la node_modules
+
+      - name: 🔍 Show User Service Node Modules
+        run: ls -la user-service/node_modules
+
+      - name: 🔍 Check Prisma Client in User Service
+        run: ls -la user-service/node_modules/.prisma/client || echo "❌ Prisma Client is missing in User Service!"
+
       - name: 🏗️ Build Prisma client
         run: pnpm --filter=prisma-client run generate
+
+      - name: 🔍 Show Installed Node Modules
+        run: ls -la node_modules
+
+      - name: 🔍 Show User Service Node Modules
+        run: ls -la user-service/node_modules
+
+      - name: 🔍 Check Prisma Client in User Service
+        run: ls -la user-service/node_modules/.prisma/client || echo "❌ Prisma Client is missing in User Service!"
 
       - name: 🏗️ Build service
         run: pnpm --filter=${{ matrix.service }} run build
