@@ -36,10 +36,6 @@ Thumbs.db
 # Jest & Testing
 coverage/
 jest/
-*.test.js
-*.test.ts
-*.spec.js
-*.spec.ts
 .vscode/test.code-workspace
 
 # Misc
