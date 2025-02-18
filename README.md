@@ -9,3 +9,11 @@ a highly scalable & performant day trading system
 ```bash
 docker compose up
 ```
+
+### Send requests
+
+```bash
+curl -X POST http://localhost:5001/authentication/register \
+    -H "Content-Type: application/json" \
+    -d '{ "user_name": "janedoe", "password": "password123" }'
+```
