@@ -32,15 +32,15 @@ jobs:
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install --recursive
+        run: pnpm install --frozen-lockfile
 
       - name: 🏗️ Generate Prisma Client
         working-directory: prisma-client
-        run: pnpm run generate
+        run: pnpm generate && pnpm build
 
       - name: 🏗️ Build service
         working-directory: ${{ matrix.service }}
-        run: pnpm install && pnpm build
+        run: pnpm build
 
       - name: 🧪 Run tests
         if: matrix.service == 'matching-engine-service'
