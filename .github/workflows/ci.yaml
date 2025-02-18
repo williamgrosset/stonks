@@ -33,7 +33,7 @@ jobs:
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install
+        run: pnpm install --recursive
 
       - name: 🏗️ Build Prisma client
         run: pnpm --filter=prisma-client run generate
