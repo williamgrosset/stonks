@@ -29,14 +29,9 @@ jobs:
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install --filter=${{ matrix.service }}
+        run: pnpm install
 
-      # Generate Prisma Client first (before dependent services)
-      - name: ⚡ Generate Prisma Client
-        if: matrix.service == 'prisma-client'
-        run: pnpm --filter=prisma-client run generate
-
-      - name: ⚡ Generate Prisma Client for dependent services
+      - name: ⚡ Generate Prisma client
         if: contains(fromJson('["user-service", "order-service", "transaction-service"]'), matrix.service)
         run: pnpm --filter=prisma-client run generate
 
