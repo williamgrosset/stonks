@@ -33,7 +33,7 @@ jobs:
         run: npm install -g pnpm
 
       - name: 📦 Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --filter . --frozen-lockfile
 
       - name: 🏗️ Build service
         run: pnpm build
