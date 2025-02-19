@@ -4,3 +4,4 @@ packages:
   - 'transaction-service'
   - 'order-service'
   - 'matching-engine-service'
+  - 'app'

@@ -1,19 +1,25 @@
+import Cookies from 'js-cookie'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ChevronDown } from "lucide-react"
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { ChevronDown, User } from 'lucide-react'
 
 export function UserDropdown() {
+  const logout = () => {
+    Cookies.remove('authToken')
+    window.location.href = '/login'
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex flex-row items-center">
-        will
-        <ChevronDown size={16} className="ml-1.5" />
+        <User size={20} className="mr-1.5" />
+        <ChevronDown size={16} />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
@@ -22,7 +28,7 @@ export function UserDropdown() {
         <DropdownMenuItem>Shares</DropdownMenuItem>
         <DropdownMenuItem>Transactions</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => logout()}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -1,33 +1,77 @@
-import { Input } from "@/components/ui/input"
-import { FilterButton } from "../components/filter-button"
-import StockCard from "./components/stock-card"
+'use client'
+
+import { useState, useEffect } from 'react'
+import Cookies from 'js-cookie'
+import { Input } from '@/components/ui/input'
+import { FilterButton } from '../components/filter-button'
+import StockCard from './components/stock-card'
+
+interface Stock {
+  stock_id: string
+  stock_name: string
+  current_price: number
+}
 
 export default function Page() {
+  const [stocks, setStocks] = useState<Stock[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchStockPrices = async () => {
+      const token = Cookies.get('authToken')
+
+      if (!token) {
+        console.error('Token not found')
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch('http://localhost:5001/transaction/getStockPrices', {
+          headers: {
+            token
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch stock prices')
+        }
+
+        const { data } = await response.json()
+        setStocks(data)
+      } catch (error) {
+        console.error('Error fetching stock prices:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStockPrices()
+  }, [])
+
   return (
     <div className="flex min-h-svh w-full justify-center p-6 md:p-10">
       <div className="w-full max-w-5xl space-y-4">
         <div className="flex flex-row items-center justify-between w-full">
           <h1 className="text-4xl font-semibold">Stocks</h1>
           <div className="flex flex-row items-center space-x-2">
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
-              <span className="relative inline-flex size-2 rounded-full bg-green-500"></span>
-            </span>
-            <p className="text-sm text-green-500 pr-2">Live</p>
             <FilterButton />
             <Input type="text" placeholder="Search..." />
           </div>
         </div>
         <div className="grid grid-cols-3 gap-4">
-          <StockCard name="aapl" price="85" quantity="40" />
-          <StockCard name="amzn" price="80" quantity="30" />
-          <StockCard name="goog" price="60" quantity="25" />
-          <StockCard name="intc" price="75" quantity="50" />
-          <StockCard name="meta" price="90" quantity="60" />
-          <StockCard name="msft" price="95" quantity="55" />
-          <StockCard name="nvda" price="80" quantity="35" />
-          <StockCard name="nflx" price="90" quantity="30" />
-          <StockCard name="tsla" price="65" quantity="50" />
+          {loading ? (
+            <p>Loading...</p>
+          ) : (
+            stocks.map(stock => (
+              <StockCard
+                key={stock.stock_id}
+                id={stock.stock_id}
+                name={stock.stock_name}
+                price={stock.current_price}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
