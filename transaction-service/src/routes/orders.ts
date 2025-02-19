@@ -44,11 +44,38 @@ async function routes(fastify: FastifyInstance) {
     const { stock_transaction_id } = request.body
 
     try {
-      await prisma.stock_transactions.update({
-        where: { id: parseInt(stock_transaction_id) },
-        data: {
-          order_status: 'CANCELLED'
+      await prisma.$transaction(async prisma => {
+        const stockTransaction = await prisma.stock_transactions.findUniqueOrThrow({
+          where: { id: parseInt(stock_transaction_id) },
+          include: {
+            child_transactions: true
+          }
+        })
+
+        let quantity = stockTransaction.quantity
+
+        for (const child of stockTransaction.child_transactions) {
+          quantity -= child.quantity
         }
+
+        if (quantity > 0) {
+          await prisma.shares.update({
+            where: {
+              stock_id_user_id: {
+                stock_id: stockTransaction.stock_id,
+                user_id: stockTransaction.user_id
+              }
+            },
+            data: {
+              quantity: { increment: quantity }
+            }
+          })
+        }
+
+        await prisma.stock_transactions.update({
+          where: { id: stockTransaction.id },
+          data: { order_status: 'CANCELLED' }
+        })
       })
 
       return reply.send({ success: true, data: null })
