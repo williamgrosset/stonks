@@ -18,6 +18,7 @@ jobs:
           - order-service
           - matching-engine-service
           - transaction-service
+          - app
 
     steps:
       - name: 📥 Checkout repository
@@ -35,6 +36,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: 🏗️ Generate Prisma Client
+        if: matrix.service != 'app'
         working-directory: prisma-client
         run: pnpm generate && pnpm build
 
