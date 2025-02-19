@@ -41,6 +41,7 @@ WORKDIR /usr/local/openresty/nginx/conf/
 
 # Copy configuration and Lua script
 COPY nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
+COPY cors.conf /usr/local/openresty/nginx/conf/cors.conf
 COPY jwt.lua /usr/local/openresty/nginx/conf/jwt.lua
 
 # Expose port 80 for OpenResty
