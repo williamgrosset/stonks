@@ -11,6 +11,7 @@ COPY user-service/ ./user-service/
 
 RUN pnpm install --frozen-lockfile --filter user-service... \
     && pnpm --filter prisma-client run generate \
+    && pnpm --filter prisma-client run build \
     && pnpm --filter user-service run build \
     && pnpm prune --prod
 

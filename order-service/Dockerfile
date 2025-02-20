@@ -11,6 +11,7 @@ COPY order-service/ ./order-service/
 
 RUN pnpm install --frozen-lockfile --filter order-service... \
     && pnpm --filter prisma-client run generate \
+    && pnpm --filter prisma-client run build \
     && pnpm --filter order-service run build \
     && pnpm prune --prod
 

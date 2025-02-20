@@ -8,7 +8,7 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 
 COPY matching-engine-service/ ./matching-engine-service/
 
-RUN pnpm install --frozen-lockfile --filter matching-engine-service... \
+RUN pnpm install --frozen-lockfile --filter matching-engine-service \
     && pnpm --filter matching-engine-service run build \
     && pnpm prune --prod
 

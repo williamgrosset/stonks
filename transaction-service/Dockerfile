@@ -11,6 +11,7 @@ COPY transaction-service/ ./transaction-service/
 
 RUN pnpm install --frozen-lockfile --filter transaction-service... \
     && pnpm --filter prisma-client run generate \
+    && pnpm --filter prisma-client run build \
     && pnpm --filter transaction-service run build \
     && pnpm prune --prod
 
