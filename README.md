@@ -21,3 +21,9 @@ curl -X POST http://localhost:5001/authentication/register \
 ### Use web UI
 
 Navigate to `localhost:8080/login`
+
+### Run tests
+
+```bash
+jmeter -n -t ./scripts/sample_test_script.jmx -l results.log -e -o ./results/
+```

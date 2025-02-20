@@ -4,3 +4,8 @@ TODO.md
 # Node.js dependencies
 node_modules/
 .pnpm-store/
+
+# JMeter scripts
+jmeter.log
+results.log
+results/
