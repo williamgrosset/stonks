@@ -50,29 +50,31 @@ async function routes(fastify: FastifyInstance) {
       if (is_buy && order_type === 'MARKET') {
         const orderData = await redis.zrange(`sell_orders:${stock_id}`, 0, 0)
 
-        if (orderData.length === 0) {
-          return reply
-            .status(400)
-            .send({ success: false, data: { error: 'No available sell orders' } })
-        }
+        let price = 0
 
-        const lowestSellOrder = JSON.parse(orderData[0])
-        const price = lowestSellOrder.price * quantity
+        try {
+          const lowestSellOrder = JSON.parse(orderData[0])
+          price = lowestSellOrder.price * quantity
+        } catch (_) {
+          // Fail safely when there are insufficient sell orders
+        }
 
         if (user.wallet_balance < price) {
           return reply.status(400).send({ success: false, data: { error: 'Insufficient funds' } })
         }
 
-        await prisma.users.update({
-          where: { id: parseInt(user_id) },
-          data: {
-            wallet_balance: { decrement: price }
-          }
-        })
+        if (price > 0) {
+          await prisma.users.update({
+            where: { id: parseInt(user_id) },
+            data: {
+              wallet_balance: { decrement: price }
+            }
+          })
 
-        await ky.post('http://matching-engine-service:3003/orders/buy', {
-          json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price }
-        })
+          await ky.post('http://matching-engine-service:3003/orders/buy', {
+            json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price }
+          })
+        }
 
         return reply.status(200).send({ success: true, data: null })
       } else if (!is_buy && order_type === 'LIMIT') {
@@ -84,7 +86,6 @@ async function routes(fastify: FastifyInstance) {
           return reply.status(400).send({ success: false, data: { error: 'Insufficient shares' } })
         }
 
-        // Deduct user shares and create stock transaction
         const transaction = await prisma.$transaction(async tx => {
           await tx.shares.update({
             where: { id: shares.id },
