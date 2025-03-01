@@ -86,7 +86,7 @@
           </elementProp>
           <elementProp name="configPath" elementType="Argument">
             <stringProp name="Argument.name">configPath</stringProp>
-            <stringProp name="Argument.value">Config/</stringProp>
+            <stringProp name="Argument.value">/Users/williamgrosset/anvil/stonks/scripts/test-run-2/Config/</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -915,7 +915,7 @@ csvFile.append(appleStockId);</stringProp>
         </DebugSampler>
         <hashTree/>
       </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
