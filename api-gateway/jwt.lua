@@ -5,8 +5,6 @@ local SECRET_KEY = "supersecret"
 local jwt_cache = ngx.shared.jwt_cache
 
 local function verify_jwt()
-  ngx.log(ngx.ERR, "[JWT] running verify_jwt() middleware...")
-
   local headers = ngx.req.get_headers()
   local token = headers["token"]
 
@@ -20,7 +18,6 @@ local function verify_jwt()
   local cached_user_id = jwt_cache:get(token)
 
   if cached_user_id then
-    ngx.log(ngx.ERR, "[JWT] Token found in cache")
     ngx.req.set_header("X-User-ID", cached_user_id)
     return
   end
@@ -46,8 +43,6 @@ local function verify_jwt()
   jwt_cache:set(token, user_id, 300)
 
   ngx.req.set_header("X-User-ID", user_id)
-
-  ngx.log(ngx.ERR, "[JWT] JWT verified successfully for user_id: " .. user_id)
 end
 
 verify_jwt()
