@@ -12,7 +12,7 @@ model users {
   user_name      String  @unique @db.VarChar(255)
   password       String
   display_name   String? @db.VarChar(255)
-  wallet_balance Int     @default(0)
+  wallet_balance BigInt  @default(0)
 
   stocks              stocks[]
   shares              shares[]
@@ -31,10 +31,10 @@ model stocks {
 }
 
 model shares {
-  id       Int @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   stock_id Int
   user_id  Int
-  quantity Int @default(0)
+  quantity BigInt @default(0)
 
   stock stocks @relation(fields: [stock_id], references: [id])
   user  users  @relation(fields: [user_id], references: [id])
@@ -50,8 +50,8 @@ model stock_transactions {
   user_id                     Int
   order_status                OrderStatus
   order_type                  OrderType
-  quantity                    Int
-  price                       Int
+  quantity                    BigInt
+  price                       BigInt
   time_stamp                  DateTime    @default(now()) @db.Timestamptz
 
   stock              stocks               @relation(fields: [stock_id], references: [id])
@@ -65,7 +65,7 @@ model wallet_transactions {
   id         Int      @id @default(autoincrement())
   user_id    Int
   is_debit   Boolean
-  amount     Int
+  amount     BigInt
   time_stamp DateTime @default(now()) @db.Timestamptz
 
   stock_transaction stock_transactions?

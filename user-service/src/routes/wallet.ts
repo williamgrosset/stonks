@@ -47,7 +47,7 @@ async function routes(fastify: FastifyInstance) {
         }
       })
 
-      return reply.status(200).send({ success: true, data: { balance: wallet_balance } })
+      return reply.status(200).send({ success: true, data: { balance: wallet_balance.toString() } })
     } catch (error) {
       return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }

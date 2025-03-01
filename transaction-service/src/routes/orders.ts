@@ -94,7 +94,7 @@ async function routes(fastify: FastifyInstance) {
     const stockIdInt = parseInt(stock_id)
 
     try {
-      const transaction = await prisma.$transaction(async tx => {
+      await prisma.$transaction(async tx => {
         // ---------- BUYER -----------
         // Add shares to user
         await tx.shares.upsert({
@@ -183,7 +183,7 @@ async function routes(fastify: FastifyInstance) {
         }
       })
 
-      return reply.send({ success: true, data: transaction })
+      return reply.send({ success: true, data: null })
     } catch (error) {
       console.error('Error completing order:', error)
       return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
