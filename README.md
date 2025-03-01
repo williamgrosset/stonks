@@ -27,12 +27,12 @@ Navigate to `localhost:8080/login`
 #### 1 user
 
 ```bash
-jmeter -n -t ./scripts/test-run-1/sample_test_script.jmx -l results.log
+jmeter -n -t ./scripts/test-run-1/sample_test_script.jmx -l results.log -e -o ./results
 ```
 
 #### 1k to 10k users
 
 ```bash
-jmeter -n -t ./scripts/test-run-2/InitialSetup.jmx -l results.log
-jmeter -n -t ./scripts/test-run-2/UserThreadTest.jmx -l results.log
+jmeter -n -t ./scripts/test-run-2/InitialSetup.jmx -l results.log -e -o ./results
+jmeter -n -t ./scripts/test-run-2/UserThreadTest.jmx -l results.log -e -o ./results
 ```
