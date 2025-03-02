@@ -8,7 +8,8 @@ export const prisma =
   new PrismaClient({
     datasources: {
       db: { url: process.env.DATABASE_URL }
-    }
+    },
+    log: ['info']
   })
 
 if (process.env.NODE_ENV !== 'production') {
