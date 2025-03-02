@@ -1,10 +1,14 @@
 import Fastify from 'fastify'
+import fastifyMetrics from 'fastify-metrics'
 import pricesRoutes from './routes/prices.js'
 import orderRoutes from './routes/orders.js'
 
 const PORT = process.env.PORT || 3002
 
 const fastify = Fastify({ logger: true })
+
+// @ts-ignore
+fastify.register(fastifyMetrics, { endpoint: '/metrics' })
 
 fastify.register(pricesRoutes)
 fastify.register(orderRoutes)

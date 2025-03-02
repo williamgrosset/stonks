@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import fastifyMetrics from 'fastify-metrics'
 import stocksRoutes from './routes/stocks.js'
 import walletsRoutes from './routes/wallets.js'
 import ordersRoutes from './routes/orders.js'
@@ -6,6 +7,9 @@ import ordersRoutes from './routes/orders.js'
 const PORT = process.env.PORT || 3001
 
 const fastify = Fastify({ logger: true })
+
+// @ts-ignore
+fastify.register(fastifyMetrics, { endpoint: '/metrics' })
 
 fastify.register(stocksRoutes)
 fastify.register(walletsRoutes)

@@ -131,6 +131,28 @@ services:
     networks:
       - internal_network
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    networks:
+      - internal_network
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    ports:
+      - '9100:9100'
+    networks:
+      - internal_network
+
   app:
     build:
       context: .

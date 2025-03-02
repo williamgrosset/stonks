@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 5s # How often to scrape targets
+  evaluation_interval: 5s # How often to evaluate rules
+
+scrape_configs:
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  - job_name: 'fastify-metrics'
+    static_configs:
+      - targets:
+          - 'user-service:3000'
+          - 'transaction-service:3001'
+          - 'order-service:3002'
