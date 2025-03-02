@@ -3,15 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model users {
-  id             Int     @id @default(autoincrement())
-  user_name      String  @unique @db.VarChar(255)
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  user_name      String  @unique
   password       String
-  display_name   String? @db.VarChar(255)
+  display_name   String?
   wallet_balance BigInt  @default(0)
 
   stocks              stocks[]
@@ -21,55 +21,47 @@ model users {
 }
 
 model stocks {
-  id         Int    @id @default(autoincrement())
-  user_id    Int
-  stock_name String @unique @db.VarChar(255)
-
-  user               users                @relation(fields: [user_id], references: [id])
-  shares             shares[]
-  stock_transactions stock_transactions[]
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String
+  stock_name String  @unique
+  users      users?  @relation(fields: [usersId], references: [id])
+  usersId    String? @db.ObjectId
 }
 
 model shares {
-  id       Int    @id @default(autoincrement())
-  stock_id Int
-  user_id  Int
-  quantity BigInt @default(0)
-
-  stock stocks @relation(fields: [stock_id], references: [id])
-  user  users  @relation(fields: [user_id], references: [id])
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  stock_id String
+  user_id  String
+  quantity BigInt  @default(0)
+  users    users?  @relation(fields: [usersId], references: [id])
+  usersId  String? @db.ObjectId
 
   @@unique([stock_id, user_id], name: "stock_id_user_id")
 }
 
 model stock_transactions {
-  id                          Int         @id @default(autoincrement())
-  parent_stock_transaction_id Int?
-  wallet_transaction_id       Int?        @unique
-  stock_id                    Int
-  user_id                     Int
+  id                          String      @id @default(auto()) @map("_id") @db.ObjectId
+  parent_stock_transaction_id String?
+  wallet_transaction_id       String?     @unique
+  stock_id                    String
+  user_id                     String
   order_status                OrderStatus
   order_type                  OrderType
   quantity                    BigInt
   price                       BigInt
-  time_stamp                  DateTime    @default(now()) @db.Timestamptz
-
-  stock              stocks               @relation(fields: [stock_id], references: [id])
-  user               users                @relation(fields: [user_id], references: [id])
-  parent_transaction stock_transactions?  @relation("StockTransactionParent", fields: [parent_stock_transaction_id], references: [id])
-  child_transactions stock_transactions[] @relation("StockTransactionParent")
-  wallet_transaction wallet_transactions? @relation(fields: [wallet_transaction_id], references: [id])
+  time_stamp                  DateTime    @default(now())
+  users                       users?      @relation(fields: [usersId], references: [id])
+  usersId                     String?     @db.ObjectId
 }
 
 model wallet_transactions {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String
   is_debit   Boolean
   amount     BigInt
-  time_stamp DateTime @default(now()) @db.Timestamptz
-
-  stock_transaction stock_transactions?
-  user              users               @relation(fields: [user_id], references: [id])
+  time_stamp DateTime @default(now())
+  users      users?   @relation(fields: [usersId], references: [id])
+  usersId    String?  @db.ObjectId
 }
 
 enum OrderStatus {

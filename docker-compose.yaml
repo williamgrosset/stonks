@@ -1,23 +1,18 @@
 services:
   db:
-    image: postgres:15
-    container_name: postgres_db
+    image: mongo:6
+    container_name: mongodb
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: stonks_db
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: stonks_db
     ports:
-      - '5432:5432'
+      - '27017:27017'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongo_data:/data/db
     networks:
       - internal_network
-    healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
-      interval: 10s
-      retries: 5
-      start_period: 5s
 
   redis:
     image: redis:7
@@ -42,10 +37,10 @@ services:
       dockerfile: ./prisma-client/Dockerfile
     depends_on:
       db:
-        condition: service_healthy
+        condition: service_started
     restart: on-failure
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'mongodb://mongo:mongo@db:27017/stonks_db?authSource=admin'
     networks:
       - internal_network
 
@@ -75,7 +70,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'mongodb://mongo:mongo@db:27017/stonks_db?authSource=admin'
     networks:
       - internal_network
 
@@ -90,7 +85,7 @@ services:
     ports:
       - '3001:3001'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'mongodb://mongo:mongo@db:27017/stonks_db?authSource=admin'
     networks:
       - internal_network
 
@@ -109,7 +104,7 @@ services:
     ports:
       - '3002:3002'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'mongodb://mongo:mongo@db:27017/stonks_db?authSource=admin'
       REDIS_URL: redis://redis:6379
     networks:
       - internal_network
@@ -155,7 +150,7 @@ services:
       - internal_network
 
 volumes:
-  postgres_data:
+  mongo_data:
   redis_data:
 
 networks:
