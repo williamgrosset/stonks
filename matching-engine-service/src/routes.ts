@@ -36,11 +36,12 @@ async function routes(fastify: FastifyInstance) {
         time_stamp: Date.now()
       }
 
-      await redis.sadd('stocks', stock_id)
-
-      await redis.zadd(`sell_orders:${stock_id}`, price, JSON.stringify(order))
-
-      await redis.hset('sell_orders_index', stock_transaction_id, stock_id)
+      await redis
+        .multi()
+        .sadd('stocks', stock_id)
+        .zadd(`sell_orders:${stock_id}`, price, JSON.stringify(order))
+        .hset('sell_orders_index', stock_transaction_id, stock_id)
+        .exec()
 
       return reply.send({ success: true, data: null })
     } catch (error) {
@@ -91,16 +92,19 @@ async function routes(fastify: FastifyInstance) {
       sellOrderData.quantity -= quantity
 
       if (sellOrderData.quantity === 0) {
-        await redis.zpopmin(`sell_orders:${stock_id}`)
-        await redis.hdel('sell_orders_index', sellOrderData.stock_transaction_id)
+        await redis
+          .multi()
+          .zpopmin(`sell_orders:${stock_id}`)
+          .hdel('sell_orders_index', sellOrderData.stock_transaction_id)
+          .exec()
       } else {
-        await redis.zrem(`sell_orders:${stock_id}`, sellOrder[0])
-        await redis.zadd(
-          `sell_orders:${stock_id}`,
-          sellOrderData.price,
-          JSON.stringify(sellOrderData)
-        )
         isPartial = true
+
+        await redis
+          .multi()
+          .zrem(`sell_orders:${stock_id}`, sellOrder[0])
+          .zadd(`sell_orders:${stock_id}`, sellOrderData.price, JSON.stringify(sellOrderData))
+          .exec()
       }
 
       await ky.post('http://transaction-service:3001/orders/complete', {
@@ -151,9 +155,11 @@ async function routes(fastify: FastifyInstance) {
           .send({ success: false, data: { error: 'Order not found or already executed' } })
       }
 
-      await redis.zrem(`sell_orders:${stock_id}`, JSON.stringify(order))
-
-      await redis.hdel('sell_orders_index', stock_transaction_id)
+      await redis
+        .multi()
+        .zrem(`sell_orders:${stock_id}`, JSON.stringify(order))
+        .hdel('sell_orders_index', stock_transaction_id)
+        .exec()
 
       await ky.post('http://transaction-service:3001/orders/cancel', {
         json: { stock_transaction_id }
