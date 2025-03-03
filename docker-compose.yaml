@@ -41,6 +41,35 @@ services:
       retries: 5
       start_period: 5s
 
+  # prometheus:
+  # image: prom/prometheus
+  # volumes:
+  # - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+  # ports:
+  # - '9090:9090'
+  # networks:
+  # - internal_network
+
+  # grafana:
+  # image: grafana/grafana
+  # ports:
+  # - '3070:3000'
+  # environment:
+  # - GF_SECURITY_ADMIN_PASSWORD=admin
+  # volumes:
+  # - grafana_data:/var/lib/grafana
+  # networks:
+  # - internal_network
+
+  # postgres-exporter:
+  # image: prometheuscommunity/postgres-exporter
+  # environment:
+  # DATA_SOURCE_NAME: 'postgresql://postgres:postgres@db:5432/stonks_db?sslmode=disable'
+  # ports:
+  # - '9187:9187'
+  # networks:
+  # - internal_network
+
   redis:
     image: redis:7
     container_name: redis_service
@@ -153,28 +182,28 @@ services:
     networks:
       - internal_network
 
-  app:
-    build:
-      context: .
-      dockerfile: ./app/Dockerfile
-    container_name: nextjs_app
-    depends_on:
-      api-gateway:
-        condition: service_started
-      user-service:
-        condition: service_started
-      transaction-service:
-        condition: service_started
-      order-service:
-        condition: service_started
-      matching-engine-service:
-        condition: service_started
-    ports:
-      - '8080:8080'
-    environment:
-      NODE_ENV: production
-    networks:
-      - internal_network
+  # app:
+  # build:
+  # context: .
+  # dockerfile: ./app/Dockerfile
+  # container_name: nextjs_app
+  # depends_on:
+  # api-gateway:
+  # condition: service_started
+  # user-service:
+  # condition: service_started
+  # transaction-service:
+  # condition: service_started
+  # order-service:
+  # condition: service_started
+  # matching-engine-service:
+  # condition: service_started
+  # ports:
+  # - '8080:8080'
+  # environment:
+  # NODE_ENV: production
+  # networks:
+  # - internal_network
 
 volumes:
   postgres_data:
