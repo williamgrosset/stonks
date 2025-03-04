@@ -41,35 +41,6 @@ services:
       retries: 5
       start_period: 5s
 
-  # prometheus:
-  # image: prom/prometheus
-  # volumes:
-  # - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
-  # ports:
-  # - '9090:9090'
-  # networks:
-  # - internal_network
-
-  # grafana:
-  # image: grafana/grafana
-  # ports:
-  # - '3070:3000'
-  # environment:
-  # - GF_SECURITY_ADMIN_PASSWORD=admin
-  # volumes:
-  # - grafana_data:/var/lib/grafana
-  # networks:
-  # - internal_network
-
-  # postgres-exporter:
-  # image: prometheuscommunity/postgres-exporter
-  # environment:
-  # DATA_SOURCE_NAME: 'postgresql://postgres:postgres@db:5432/stonks_db?sslmode=disable'
-  # ports:
-  # - '9187:9187'
-  # networks:
-  # - internal_network
-
   redis:
     image: redis:7
     container_name: redis_service
@@ -208,7 +179,6 @@ services:
 volumes:
   postgres_data:
   redis_data:
-  grafana_data:
 
 networks:
   internal_network:
