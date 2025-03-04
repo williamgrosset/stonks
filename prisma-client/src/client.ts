@@ -8,12 +8,23 @@ export const prisma =
   new PrismaClient({
     datasources: {
       db: { url: process.env.DATABASE_URL }
-    }
+    },
+    log: ['query']
   })
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma
 }
+
+// @ts-ignore
+prisma.$on('query', event => {
+  // @ts-ignore
+  console.log(`Query: ${event.query}`)
+  // @ts-ignore
+  console.log(`Params: ${event.params}`)
+  // @ts-ignore
+  console.log(`Duration: ${event.duration} ms`)
+})
 
 export type User<T extends Prisma.usersInclude = {}> = Prisma.usersGetPayload<{ include: T }>
 export type Stock<T extends Prisma.stocksInclude = {}> = Prisma.stocksGetPayload<{ include: T }>
