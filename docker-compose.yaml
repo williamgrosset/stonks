@@ -11,10 +11,32 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
     networks:
       - internal_network
     healthcheck:
       test: ['CMD', 'pg_isready', '-U', 'postgres']
+      interval: 10s
+      retries: 5
+      start_period: 5s
+
+  pgbouncer:
+    image: edoburu/pgbouncer
+    container_name: pgbouncer
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '6432:6432'
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt
+    networks:
+      - internal_network
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', 'pgbouncer', '-p', '6432']
       interval: 10s
       retries: 5
       start_period: 5s
@@ -41,11 +63,11 @@ services:
       context: .
       dockerfile: ./prisma-client/Dockerfile
     depends_on:
-      db:
+      pgbouncer:
         condition: service_healthy
     restart: on-failure
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
     networks:
       - internal_network
 
@@ -75,7 +97,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
     networks:
       - internal_network
 
@@ -90,7 +112,7 @@ services:
     ports:
       - '3001:3001'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
     networks:
       - internal_network
 
@@ -109,7 +131,7 @@ services:
     ports:
       - '3002:3002'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
       REDIS_URL: redis://redis:6379
     networks:
       - internal_network
@@ -131,28 +153,28 @@ services:
     networks:
       - internal_network
 
-  app:
-    build:
-      context: .
-      dockerfile: ./app/Dockerfile
-    container_name: nextjs_app
-    depends_on:
-      api-gateway:
-        condition: service_started
-      user-service:
-        condition: service_started
-      transaction-service:
-        condition: service_started
-      order-service:
-        condition: service_started
-      matching-engine-service:
-        condition: service_started
-    ports:
-      - '8080:8080'
-    environment:
-      NODE_ENV: production
-    networks:
-      - internal_network
+  # app:
+  # build:
+  # context: .
+  # dockerfile: ./app/Dockerfile
+  # container_name: nextjs_app
+  # depends_on:
+  # api-gateway:
+  # condition: service_started
+  # user-service:
+  # condition: service_started
+  # transaction-service:
+  # condition: service_started
+  # order-service:
+  # condition: service_started
+  # matching-engine-service:
+  # condition: service_started
+  # ports:
+  # - '8080:8080'
+  # environment:
+  # NODE_ENV: production
+  # networks:
+  # - internal_network
 
 volumes:
   postgres_data:

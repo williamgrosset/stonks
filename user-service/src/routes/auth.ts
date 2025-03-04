@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
+import bcrypt from 'bcrypt'
 import prisma from '../prisma.js'
 
 const SECRET_KEY = 'supersecret'
@@ -23,7 +23,7 @@ async function routes(fastify: FastifyInstance) {
         return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
-      const hashedPassword = await bcrypt.hash(password, 10)
+      const hashedPassword = await bcrypt.hash(password, 1)
 
       await prisma.users.create({
         data: {
