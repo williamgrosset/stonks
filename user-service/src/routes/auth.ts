@@ -22,16 +22,6 @@ async function routes(fastify: FastifyInstance) {
         return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
-      const user = await prisma.users.findUnique({
-        where: {
-          user_name
-        }
-      })
-
-      if (user) {
-        return reply.status(400).send({ success: false, data: { error: 'User already exists' } })
-      }
-
       await prisma.users.create({
         data: {
           user_name,
