@@ -6,7 +6,7 @@ import portfolioRoutes from './routes/portfolio.js'
 
 const PORT = process.env.PORT || 3000
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({ logger: { level: 'error' } })
 
 fastify.register(authRoutes)
 fastify.register(setupRoutes)
