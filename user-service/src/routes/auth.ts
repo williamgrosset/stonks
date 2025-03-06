@@ -32,6 +32,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.status(201).send({ success: true, data: null })
     } catch (error) {
+      console.log('Register user error: ', error)
       return reply.status(400).send({ success: false, data: { error: 'User already exists' } })
     }
   })
@@ -56,6 +57,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.send({ success: true, data: { token } })
     } catch (error) {
+      console.log('Login user error: ', error)
       return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })
