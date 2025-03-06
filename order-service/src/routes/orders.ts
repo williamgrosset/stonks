@@ -72,7 +72,8 @@ async function routes(fastify: FastifyInstance) {
           })
 
           await ky.post('http://matching-engine-service:3003/orders/buy', {
-            json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price }
+            json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price },
+            timeout: 50000
           })
         }
 
