@@ -4,7 +4,7 @@ import orderRoutes from './routes/orders.js'
 
 const PORT = process.env.PORT || 3002
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({ logger: { level: 'error' } })
 
 fastify.register(pricesRoutes)
 fastify.register(orderRoutes)

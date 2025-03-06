@@ -10,13 +10,11 @@
   "dependencies": {
     "@fastify/autoload": "^6.1.0",
     "@fastify/cors": "^10.0.2",
-    "bcrypt": "^5.1.1",
     "fastify": "^5.2.1",
     "jsonwebtoken": "^9.0.2",
     "prisma-client": "workspace:^"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.13.0",

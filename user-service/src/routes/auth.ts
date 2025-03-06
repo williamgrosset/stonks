@@ -1,6 +1,5 @@
 import { FastifyInstance } from 'fastify'
 import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
 import prisma from '../prisma.js'
 
 const SECRET_KEY = 'supersecret'
@@ -23,18 +22,17 @@ async function routes(fastify: FastifyInstance) {
         return reply.status(400).send({ success: false, data: { error: 'Missing fields' } })
       }
 
-      const hashedPassword = await bcrypt.hash(password, 1)
-
       await prisma.users.create({
         data: {
           user_name,
-          password: hashedPassword,
+          password,
           display_name: name
         }
       })
 
       return reply.status(201).send({ success: true, data: null })
     } catch (error) {
+      console.log('Register user error: ', error)
       return reply.status(400).send({ success: false, data: { error: 'User already exists' } })
     }
   })
@@ -49,7 +47,7 @@ async function routes(fastify: FastifyInstance) {
         }
       })
 
-      if (!user || !(await bcrypt.compare(password, user.password))) {
+      if (!user || password !== user.password) {
         return reply.status(400).send({ success: false, data: { error: 'Invalid credentials' } })
       }
 
@@ -59,6 +57,7 @@ async function routes(fastify: FastifyInstance) {
 
       return reply.send({ success: true, data: { token } })
     } catch (error) {
+      console.log('Login user error: ', error)
       return reply.status(500).send({ success: false, data: { error: 'Internal server error' } })
     }
   })

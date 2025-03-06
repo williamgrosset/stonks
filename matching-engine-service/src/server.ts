@@ -3,7 +3,7 @@ import routes from './routes.js'
 
 const PORT = process.env.PORT || 3003
 
-const fastify = Fastify({ logger: true })
+const fastify = Fastify({ logger: { level: 'error' } })
 
 fastify.register(routes)
 
