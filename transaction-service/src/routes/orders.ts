@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify'
-import prisma from '../prisma.js'
+import prisma, { Prisma } from '../prisma.js'
 
 interface RefundOrderBody {
   user_id: string
@@ -96,35 +96,28 @@ async function routes(fastify: FastifyInstance) {
     try {
       await prisma.$transaction(
         async tx => {
-          // ---------- BUYER -----------
-          // Add shares to user
+          // Lock buyer and seller rows to prevent concurrent modifications
+          await tx.$executeRaw`
+          SELECT id FROM users WHERE id IN (${buyerIdInt}, ${sellerIdInt}) FOR UPDATE
+        `
+
+          await tx.users.update({
+            where: { id: buyerIdInt },
+            data: { wallet_balance: { decrement: price * quantity } }
+          })
+
           await tx.shares.upsert({
             where: {
-              stock_id_user_id: {
-                stock_id: stockIdInt,
-                user_id: buyerIdInt
-              }
+              stock_id_user_id: { stock_id: stockIdInt, user_id: buyerIdInt }
             },
-            update: {
-              quantity: { increment: quantity }
-            },
-            create: {
-              stock_id: stockIdInt,
-              user_id: buyerIdInt,
-              quantity
-            }
+            update: { quantity: { increment: quantity } },
+            create: { stock_id: stockIdInt, user_id: buyerIdInt, quantity }
           })
 
-          // Create wallet transaction
           const buyerWalletTx = await tx.wallet_transactions.create({
-            data: {
-              user_id: buyerIdInt,
-              is_debit: true,
-              amount: price * quantity
-            }
+            data: { user_id: buyerIdInt, is_debit: true, amount: price * quantity }
           })
 
-          // Create `COMPLETED` stock transaction
           await tx.stock_transactions.create({
             data: {
               stock_id: stockIdInt,
@@ -137,26 +130,16 @@ async function routes(fastify: FastifyInstance) {
             }
           })
 
-          // ---------- SELLER -----------
-          // Add funds to user
           await tx.users.update({
             where: { id: sellerIdInt },
-            data: {
-              wallet_balance: { increment: price * quantity }
-            }
+            data: { wallet_balance: { increment: price * quantity } }
           })
 
-          // Create wallet transaction
           const sellerWalletTx = await tx.wallet_transactions.create({
-            data: {
-              user_id: sellerIdInt,
-              is_debit: false,
-              amount: price * quantity
-            }
+            data: { user_id: sellerIdInt, is_debit: false, amount: price * quantity }
           })
 
           if (is_partial) {
-            // Create `COMPLETED` child stock transaction
             await tx.stock_transactions.create({
               data: {
                 parent_stock_transaction_id: stockTransactionIdInt,
@@ -170,13 +153,11 @@ async function routes(fastify: FastifyInstance) {
               }
             })
 
-            // Update stock transaction to `PARTIALLY_COMPLETE`
             return await tx.stock_transactions.update({
               where: { id: stockTransactionIdInt },
               data: { order_status: 'PARTIALLY_COMPLETE' }
             })
           } else {
-            // Update stock transaction to `COMPLETED`
             return await tx.stock_transactions.update({
               where: { id: stockTransactionIdInt },
               data: { order_status: 'COMPLETED', wallet_transaction_id: sellerWalletTx.id }
@@ -184,8 +165,9 @@ async function routes(fastify: FastifyInstance) {
           }
         },
         {
-          maxWait: 10000, // default: 2000
-          timeout: 20000 // default: 5000
+          maxWait: 40000,
+          timeout: 50000,
+          isolationLevel: Prisma.TransactionIsolationLevel.Serializable
         }
       )
 

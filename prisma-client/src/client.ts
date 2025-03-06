@@ -22,3 +22,4 @@ export type StockTransaction<T extends Prisma.stock_transactionsInclude = {}> =
   Prisma.stock_transactionsGetPayload<{ include: T }>
 export type WalletTransaction<T extends Prisma.wallet_transactionsInclude = {}> =
   Prisma.wallet_transactionsGetPayload<{ include: T }>
+export { Prisma }
