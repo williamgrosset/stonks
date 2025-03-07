@@ -164,7 +164,7 @@ async function routes(fastify: FastifyInstance) {
         })
 
         // 5c) Update the parent transaction to PARTIALLY_COMPLETE
-        return prisma.stock_transactions.update({
+        prisma.stock_transactions.update({
           where: { id: stockTransactionIdInt },
           data: { order_status: 'PARTIALLY_COMPLETE' }
         })
@@ -178,7 +178,7 @@ async function routes(fastify: FastifyInstance) {
           }
         })
 
-        return prisma.stock_transactions.update({
+        prisma.stock_transactions.update({
           where: { id: stockTransactionIdInt },
           data: {
             order_status: 'COMPLETED',
