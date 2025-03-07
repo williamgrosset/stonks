@@ -90,12 +90,13 @@ services:
     build:
       context: .
       dockerfile: ./user-service/Dockerfile
-    container_name: user_service
+    deploy:
+      replicas: 3
     depends_on:
       prisma-client:
         condition: service_completed_successfully
     ports:
-      - '3000:3000'
+      - '3000'
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
     networks:
@@ -105,12 +106,13 @@ services:
     build:
       context: .
       dockerfile: ./transaction-service/Dockerfile
-    container_name: transaction_service
+    deploy:
+      replicas: 3
     depends_on:
       prisma-client:
         condition: service_completed_successfully
     ports:
-      - '3001:3001'
+      - '3001'
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
     networks:
@@ -120,7 +122,8 @@ services:
     build:
       context: .
       dockerfile: ./order-service/Dockerfile
-    container_name: order_service
+    deploy:
+      replicas: 3
     depends_on:
       prisma-client:
         condition: service_completed_successfully
@@ -129,7 +132,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - '3002:3002'
+      - '3002'
     environment:
       DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
       REDIS_URL: redis://redis:6379
@@ -140,14 +143,15 @@ services:
     build:
       context: .
       dockerfile: ./matching-engine-service/Dockerfile
-    container_name: matching_engine_service
+    deploy:
+      replicas: 3
     depends_on:
       transaction-service:
         condition: service_started
       redis:
         condition: service_healthy
     ports:
-      - '3003:3003'
+      - '3003'
     environment:
       REDIS_URL: redis://redis:6379
     networks:
