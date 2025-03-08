@@ -67,7 +67,7 @@ services:
         condition: service_healthy
     restart: on-failure
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
     networks:
       - internal_network
 
@@ -91,14 +91,14 @@ services:
       context: .
       dockerfile: ./user-service/Dockerfile
     deploy:
-      replicas: 3
+      replicas: 5
     depends_on:
       prisma-client:
         condition: service_completed_successfully
     ports:
       - '3000'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
     networks:
       - internal_network
 
@@ -107,14 +107,14 @@ services:
       context: .
       dockerfile: ./transaction-service/Dockerfile
     deploy:
-      replicas: 3
+      replicas: 4
     depends_on:
       prisma-client:
         condition: service_completed_successfully
     ports:
       - '3001'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
     networks:
       - internal_network
 
@@ -134,7 +134,7 @@ services:
     ports:
       - '3002'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
       REDIS_URL: redis://redis:6379
     networks:
       - internal_network
