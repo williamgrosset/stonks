@@ -24,6 +24,12 @@ Navigate to `localhost:8080/login`
 
 ### Run load tests
 
+Ensure JMeter has enough heap memory, e.g:
+
+```bash
+export JVM_ARGS="-Xms1g -Xmx8g"
+```
+
 #### 1 user
 
 ```bash
