@@ -20,6 +20,10 @@ curl -X POST http://localhost:5001/authentication/register \
 
 ### Use web UI
 
+```bash
+docker compose --profile frontend up
+```
+
 Navigate to `localhost:8080/login`
 
 ### Run load tests

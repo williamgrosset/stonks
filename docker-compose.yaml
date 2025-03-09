@@ -157,28 +157,30 @@ services:
     networks:
       - internal_network
 
-  # app:
-  # build:
-  # context: .
-  # dockerfile: ./app/Dockerfile
-  # container_name: nextjs_app
-  # depends_on:
-  # api-gateway:
-  # condition: service_started
-  # user-service:
-  # condition: service_started
-  # transaction-service:
-  # condition: service_started
-  # order-service:
-  # condition: service_started
-  # matching-engine-service:
-  # condition: service_started
-  # ports:
-  # - '8080:8080'
-  # environment:
-  # NODE_ENV: production
-  # networks:
-  # - internal_network
+  app:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    container_name: nextjs_app
+    depends_on:
+      api-gateway:
+        condition: service_started
+      user-service:
+        condition: service_started
+      transaction-service:
+        condition: service_started
+      order-service:
+        condition: service_started
+      matching-engine-service:
+        condition: service_started
+    ports:
+      - '8080:8080'
+    environment:
+      NODE_ENV: production
+    networks:
+      - internal_network
+    profiles:
+      - frontend
 
 volumes:
   postgres_data:
