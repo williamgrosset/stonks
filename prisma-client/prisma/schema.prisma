@@ -28,6 +28,8 @@ model stocks {
   user               users                @relation(fields: [user_id], references: [id])
   shares             shares[]
   stock_transactions stock_transactions[]
+
+  @@index([user_id])
 }
 
 model shares {
@@ -40,6 +42,7 @@ model shares {
   user  users  @relation(fields: [user_id], references: [id])
 
   @@unique([stock_id, user_id], name: "stock_id_user_id")
+  @@index([user_id])
 }
 
 model stock_transactions {
@@ -59,6 +62,8 @@ model stock_transactions {
   parent_transaction stock_transactions?  @relation("StockTransactionParent", fields: [parent_stock_transaction_id], references: [id])
   child_transactions stock_transactions[] @relation("StockTransactionParent")
   wallet_transaction wallet_transactions? @relation(fields: [wallet_transaction_id], references: [id])
+
+  @@index([user_id])
 }
 
 model wallet_transactions {
@@ -70,6 +75,8 @@ model wallet_transactions {
 
   stock_transaction stock_transactions?
   user              users               @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
 }
 
 enum OrderStatus {

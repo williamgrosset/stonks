@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15
-    container_name: postgres_db
+    container_name: postgres-db
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -43,7 +43,7 @@ services:
 
   redis:
     image: redis:7
-    container_name: redis_service
+    container_name: redis-service
     restart: always
     ports:
       - '6379:6379'
@@ -67,7 +67,7 @@ services:
         condition: service_healthy
     restart: on-failure
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
     networks:
       - internal_network
 
@@ -75,7 +75,7 @@ services:
     build:
       context: ./api-gateway
       dockerfile: Dockerfile
-    container_name: api_gateway
+    container_name: api-gateway
     restart: always
     ports:
       - '5001:80'
@@ -90,14 +90,15 @@ services:
     build:
       context: .
       dockerfile: ./user-service/Dockerfile
-    container_name: user_service
+    deploy:
+      replicas: 5
     depends_on:
       prisma-client:
         condition: service_completed_successfully
     ports:
-      - '3000:3000'
+      - '3000'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
     networks:
       - internal_network
 
@@ -105,14 +106,15 @@ services:
     build:
       context: .
       dockerfile: ./transaction-service/Dockerfile
-    container_name: transaction_service
+    deploy:
+      replicas: 4
     depends_on:
       prisma-client:
         condition: service_completed_successfully
     ports:
-      - '3001:3001'
+      - '3001'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
     networks:
       - internal_network
 
@@ -120,7 +122,8 @@ services:
     build:
       context: .
       dockerfile: ./order-service/Dockerfile
-    container_name: order_service
+    deploy:
+      replicas: 3
     depends_on:
       prisma-client:
         condition: service_completed_successfully
@@ -129,9 +132,9 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - '3002:3002'
+      - '3002'
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@pgbouncer:6432/stonks_db?pool_timeout=0'
       REDIS_URL: redis://redis:6379
     networks:
       - internal_network
@@ -140,41 +143,44 @@ services:
     build:
       context: .
       dockerfile: ./matching-engine-service/Dockerfile
-    container_name: matching_engine_service
+    deploy:
+      replicas: 2
     depends_on:
       transaction-service:
         condition: service_started
       redis:
         condition: service_healthy
     ports:
-      - '3003:3003'
+      - '3003'
     environment:
       REDIS_URL: redis://redis:6379
     networks:
       - internal_network
 
-  # app:
-  # build:
-  # context: .
-  # dockerfile: ./app/Dockerfile
-  # container_name: nextjs_app
-  # depends_on:
-  # api-gateway:
-  # condition: service_started
-  # user-service:
-  # condition: service_started
-  # transaction-service:
-  # condition: service_started
-  # order-service:
-  # condition: service_started
-  # matching-engine-service:
-  # condition: service_started
-  # ports:
-  # - '8080:8080'
-  # environment:
-  # NODE_ENV: production
-  # networks:
-  # - internal_network
+  app:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    container_name: nextjs-app
+    depends_on:
+      api-gateway:
+        condition: service_started
+      user-service:
+        condition: service_started
+      transaction-service:
+        condition: service_started
+      order-service:
+        condition: service_started
+      matching-engine-service:
+        condition: service_started
+    ports:
+      - '8080:8080'
+    environment:
+      NODE_ENV: production
+    networks:
+      - internal_network
+    profiles:
+      - frontend
 
 volumes:
   postgres_data:

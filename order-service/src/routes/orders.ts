@@ -72,7 +72,9 @@ async function routes(fastify: FastifyInstance) {
           })
 
           await ky.post('http://matching-engine-service:3003/orders/buy', {
-            json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price }
+            json: { stock_id, stock_name: stock.stock_name, user_id, quantity, deduction: price },
+            timeout: 100000,
+            retry: 3
           })
         }
 
@@ -86,27 +88,25 @@ async function routes(fastify: FastifyInstance) {
           return reply.status(400).send({ success: false, data: { error: 'Insufficient shares' } })
         }
 
-        const transaction = await prisma.$transaction(async tx => {
-          await tx.shares.update({
-            where: { id: shares.id },
-            data: { quantity: { decrement: quantity } }
-          })
+        await prisma.shares.update({
+          where: { id: shares.id },
+          data: { quantity: { decrement: quantity } }
+        })
 
-          return tx.stock_transactions.create({
-            data: {
-              stock_id: stock.id,
-              user_id: user.id,
-              order_status: 'IN_PROGRESS',
-              order_type,
-              quantity,
-              price: price!
-            }
-          })
+        const stockTransaction = await prisma.stock_transactions.create({
+          data: {
+            stock_id: stock.id,
+            user_id: user.id,
+            order_status: 'IN_PROGRESS',
+            order_type,
+            quantity,
+            price: price!
+          }
         })
 
         await ky.post('http://matching-engine-service:3003/orders/sell', {
           json: {
-            stock_transaction_id: transaction.id.toString(),
+            stock_transaction_id: stockTransaction.id.toString(),
             stock_id,
             stock_name: stock.stock_name,
             user_id,

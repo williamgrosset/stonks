@@ -117,7 +117,9 @@ async function routes(fastify: FastifyInstance) {
           price: sellOrderData.price,
           quantity,
           is_partial: isPartial
-        }
+        },
+        timeout: 100000,
+        retry: 3
       })
 
       return reply.send({ success: true, data: null })
