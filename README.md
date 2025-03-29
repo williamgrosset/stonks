@@ -40,9 +40,9 @@ export JVM_ARGS="-Xms1g -Xmx8g"
 jmeter -n -t ./scripts/test-run-1/sample_test_script.jmx -l results.log -e -o ./results
 ```
 
-#### 1k to 10k users
+#### 1k to 20k users
 
 ```bash
-jmeter -n -t ./scripts/test-run-2/InitialSetup.jmx -l results.log -e -o ./results
-jmeter -n -t ./scripts/test-run-2/UserThreadTest.jmx -l results.log -e -o ./results
+jmeter -n -t ./scripts/test-run-3/InitialSetup.jmx -l results.log -e -o ./results
+jmeter -n -t ./scripts/test-run-3/UserThreadTest.jmx -l results.log -e -o ./results
 ```
