@@ -31,7 +31,7 @@ Navigate to `localhost:8080/login`
 Ensure JMeter has enough heap memory, e.g:
 
 ```bash
-export JVM_ARGS="-Xms1g -Xmx8g"
+export JVM_ARGS="-Xms1g -Xmx4g -XX:MaxMetaspaceSize=256m"
 ```
 
 #### 1 user
